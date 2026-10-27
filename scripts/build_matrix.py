@@ -48,6 +48,8 @@ ALIASES = {
     "Ananta Institute of Med. Sc., Rajsamand": "Ananta Institute of Medical Sciences & Research Centre, Rajsamand",
     "Dr.SS Tantia Medical College,Hospital and Research Center, Sriganganagar": "Dr S S Tantia Medical College Hospital & Research Centre, Sri Ganganagar",
 }
+TRUNCATED_2025_BRANCH = "MD (IMMUNOHAEMATOLOGY & BLOOD TRANSFUSION/ TRANSFUSION"
+FULL_2025_BRANCH = TRUNCATED_2025_BRANCH + " MEDICINE)"
 
 
 def clean(value: str | None) -> str:
@@ -257,7 +259,11 @@ def build(source_root: Path) -> None:
             assert 1 <= page <= int(source["PDF_pages"]), row
             add(rows, year=2025, round_name=round_name, date=row["Matrix_date"], route="MD/MS",
                 institution=clean(row["Institution"]), institution_type=clean(row["Institution_type"]),
-                branch=row["Branch"], seat_type=clean(row["Seat_type"]),
+                # Round 1 prints the full specialty. Later PDFs clip its
+                # final word at the table boundary; the row position and
+                # all other branch labels agree across the four snapshots.
+                branch=FULL_2025_BRANCH if clean(row["Branch"]) == TRUNCATED_2025_BRANCH else row["Branch"],
+                seat_type=clean(row["Seat_type"]),
                 source_seat_label=clean(row["Seat_type"]), seats=num(row["Seats"]),
                 source_id=source_id, page=page)
         by_year[2025].extend(rows)

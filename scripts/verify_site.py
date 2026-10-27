@@ -12,6 +12,9 @@ from urllib.parse import urlsplit
 
 from openpyxl import load_workbook
 
+from labels import VALID_2025_COLLEGES, VALID_2025_COURSES
+from build_matrix import FULL_2025_BRANCH, TRUNCATED_2025_BRANCH
+
 
 ROOT = Path(__file__).resolve().parents[1]
 
@@ -70,13 +73,21 @@ def main() -> None:
         assert all(row["pdf_page"] > 0 for row in rows), stem
         if kind == "allotment":
             assert all(row["college"] and row["course"] and row["seat_type"] and row["service_status"] for row in rows), stem
+            if year == 2025:
+                assert {row["college"] for row in rows} == VALID_2025_COLLEGES, "Unreviewed/missing 2025 college label"
+                assert {row["course"] for row in rows} == VALID_2025_COURSES, "Unreviewed/missing 2025 course label"
+            else:
+                assert all(row["course"].startswith(("MD (", "MS (", "Post MBBS ", "Post Diploma ")) for row in rows)
         if year == 2025:
             assert all("General" not in row["domicile"] and "OBC" not in row["domicile"] for row in rows), stem
         assert all(row["neet_pg_air"] is None for row in rows) if year == 2024 else all(row["neet_pg_air"] for row in rows), stem
         with (ROOT / "data" / f"{stem}.csv").open(encoding="utf-8-sig", newline="") as stream:
             reader = csv.DictReader(stream)
             assert "source_pdf_url" in reader.fieldnames
-            assert sum(1 for _ in reader) == count
+            for index, exported in enumerate(reader):
+                if kind == "allotment":
+                    assert (exported["college"], exported["course"]) == (rows[index]["college"], rows[index]["course"])
+            assert index + 1 == count
         rows_by_key[(year,kind)] = rows
 
     for year in (2024, 2025):
@@ -89,6 +100,18 @@ def main() -> None:
             assert allot["considered_category"] == source["considered_category"]
             assert allot["service_status"] == source["service_status"]
 
+    checked_2025 = {(r["round"], r["registration_id"]): r for r in rows_by_key[(2025, "allotment")]}
+    for registration, college, course in [
+        ("PM0590", "Mahatma Gandhi Medical College and Hospital, Jaipur", "MS (Ophthalmology)"),
+        ("PM0129", "Jaipur National University Institute for Medical Sciences and Research Centre, Jaipur.", "MD (General Medicine)"),
+        ("PM2491", "Ananta Institute of Medical Sciences and Research Centre, Rajsamand", "MD (Paediatrics)"),
+        ("PM2335", "Mahatma Gandhi Medical College and Hospital, Jaipur", "MD (Nuclear Medicine)"),
+        ("PM1642", "American International Institute Of Medical Sciences", "MS (General Surgery)"),
+        ("PM5283", "Geetanjali Medical College & Hospital, Udaipur", "MS (General Surgery)"),
+    ]:
+        row = checked_2025[("Round 1" if registration in {"PM0590", "PM0129"} else "Round 3", registration)]
+        assert (row["college"], row["course"]) == (college, course), registration
+
     workbook = load_workbook(ROOT / "data" / "Rajasthan-NEET-PG-2024-2025-filterable.xlsx", read_only=False)
     for (year, kind), count in expected.items():
         sheet = workbook[f"{year} {'Merit' if kind == 'merit' else 'Allotments'}"]
@@ -97,6 +120,10 @@ def main() -> None:
         assert "Provisional Considered Category" in headers and "Service / Non-Service" in headers
         if kind == "allotment":
             assert "Allotted Seat Type" in headers
+            if year == 2025:
+                college_col, course_col = headers.index("College") + 1, headers.index("Course") + 1
+                for index, row in enumerate(rows, 2):
+                    assert (sheet.cell(index, college_col).value, sheet.cell(index, course_col).value) == (row["college"], row["course"])
         page_col = headers.index("Source PDF Page") + 1
         assert sheet.cell(2, page_col).hyperlink.target.startswith("https://pramod-zillella.github.io/")
 
@@ -116,6 +143,9 @@ def main() -> None:
     for year, expected_count in matrix_counts.items():
         rows = json.loads((ROOT / "data" / f"{year}-matrix.json").read_text(encoding="utf-8"))
         assert len(rows) == expected_count and all(r["year"] == year and r["seats"] >= 0 for r in rows)
+        if year == 2025:
+            assert FULL_2025_BRANCH in {r["branch"] for r in rows}
+            assert TRUNCATED_2025_BRANCH not in {r["branch"] for r in rows}
         available = json.loads((ROOT / "data" / f"{year}-matrix-available.json").read_text(encoding="utf-8"))
         assert available == [r for r in rows if r["seats"] > 0]
         assert all(r["source_id"] in by_source and 1 <= r["pdf_page"] <= by_source[r["source_id"]]["pages"] for r in rows)
@@ -129,9 +159,14 @@ def main() -> None:
             for index, exported in enumerate(reader):
                 source = by_source[rows[index]["source_id"]]
                 assert exported["source_pdf_url"] == f"https://pramod-zillella.github.io/neet-rajasthan-pg-counselling/{source['path']}#page={rows[index]['pdf_page']}"
+                assert exported["branch"] == rows[index]["branch"]
             assert index + 1 == expected_count
         sheet = matrix_book[f"{year} Matrix"]
         assert sheet.max_row == expected_count + 1
+        if year == 2025:
+            branch_col = [c.value for c in sheet[1]].index("Course / Branch") + 1
+            for index, row in enumerate(rows, 2):
+                assert sheet.cell(index, branch_col).value == row["branch"]
         page_col = [c.value for c in sheet[1]].index("Source PDF Page") + 1
         assert sheet.cell(2, page_col).hyperlink.target.startswith("https://pramod-zillella.github.io/")
     assert len(list((ROOT / "documents" / "2024" / "matrix").glob("*.pdf"))) == 10

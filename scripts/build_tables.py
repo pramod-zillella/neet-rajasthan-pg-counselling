@@ -20,6 +20,8 @@ from openpyxl.styles import Alignment, Font, PatternFill
 from openpyxl.utils import get_column_letter
 from openpyxl.worksheet.table import Table, TableStyleInfo
 
+from labels import normalize_2025_college, normalize_2025_course
+
 
 ROOT = Path(__file__).resolve().parents[1]
 SITE_BASE = "https://pramod-zillella.github.io/neet-rajasthan-pg-counselling/"
@@ -223,13 +225,8 @@ def normalize_2025_seat_and_course(raw_seat: str, raw_course: str) -> tuple[str,
     elif not seat and course.endswith("LeprosAI"):
         seat = "AI"
         course = course.removesuffix("AI")
-    if "Skin & V.D" in course or "Dermatology Ven." in course:
-        # The source uses several variants. In R3, the course text also
-        # collides with the seat-type column. Use an explicit normalized
-        # specialty label rather than publishing the corrupted extraction.
-        course = "MD (Dermatology, Venereology and Leprosy)"
     assert seat in {"Government", "AI", "Management"}, (raw_seat, raw_course)
-    return seat, course
+    return seat, normalize_2025_course(course)
 
 
 def normalize_2025_domiciles(merit: list[dict]) -> None:
@@ -296,7 +293,7 @@ def load_2025(source_root: Path) -> tuple[list[dict], list[dict]]:
         "registration_id": clean(r["Registration_ID"]),
         "merit_number": integer(r["Allotment_state_merit"]),
         "neet_pg_air": integer(r["NEET_PG_AIR"]),
-        "college": clean(r["College"]),
+        "college": normalize_2025_college(r["College"]),
         "course": normalize_2025_seat_and_course(r["Seat_type"], r["Course"])[1],
         "seat_type": normalize_2025_seat_and_course(r["Seat_type"], r["Course"])[0],
         "domicile": merit_by_id[(r["Round"], r["Registration_ID"])]["domicile"],
@@ -364,6 +361,7 @@ def save_workbook(data: dict[tuple[int, str], list[dict]]) -> None:
         "2024 Round 1 allotment Merit Number is combined merit; later 2024 rounds use state merit after weightage.",
         "2024 Stray and Special Stray allotments are archive links only and have no extracted rows.",
         "The recovered 2025 Round 3 allotment PDF is incomplete or unverified (74 physical pages; footer says of 125).",
+        "Some 2025 college and course labels overlapped adjacent rows or candidate names in the PDF text layer; checked labels were normalized.",
         "A few 2025 domicile names ran into the category column; clear state prefixes were normalized. Dadra and Nagar remains marked as truncated in the PDF.",
         "Provisional allotments do not prove final joining. Candidates can recur across rounds; counts are not unique candidates.",
         "Names, relatives, gender and NEET roll identifiers are omitted from these derived tables.",
