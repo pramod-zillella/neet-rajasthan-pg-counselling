@@ -128,6 +128,16 @@ let browser, ws;
     ['Domicile not applicable','0','1','+1'],
     ['Total ahead','2,084','2,084','0']
   ]);
+  assert.equal(await evaluate(`document.querySelectorAll('#nonservice-milestones tr').length`), 18);
+  assert.deepEqual(await evaluate(`Array.from(document.querySelector('#nonservice-milestones [data-milestone="1200"]').closest('tr').cells).map(cell=>cell.textContent.trim())`), ['1,200','1,200','24,990','1,198','24,779']);
+  await evaluate(`(()=>{const select=document.getElementById('nonservice-domicile');select.value='other';select.dispatchEvent(new Event('change',{bubbles:true}));})()`);
+  assert.deepEqual(await evaluate(`Array.from(document.querySelector('#nonservice-milestones [data-milestone="1200"]').closest('tr').cells).map(cell=>cell.textContent.trim())`), ['1,200','1,197','24,939','1,195','24,648']);
+  assert.ok((await evaluate(`location.search`)).includes('ns=other'));
+  await evaluate(`document.querySelector('#nonservice-milestones [data-milestone="1200"]').click()`);
+  await waitFor(`document.getElementById('position-title').textContent.includes('1,200')`);
+  assert.ok((await evaluate(`document.getElementById('nonservice-reading').textContent`)).includes('24,648'));
+  await evaluate(`(()=>{const select=document.getElementById('nonservice-domicile');select.value='all';select.dispatchEvent(new Event('change',{bubbles:true}));})()`);
+  assert.ok((await evaluate(`document.getElementById('nonservice-reading').textContent`)).includes('actual state rank 1,198'));
   await evaluate(`(()=>{const input=document.getElementById('rank-input');input.value='3300';document.getElementById('rank-form').requestSubmit();})()`);
   await waitFor(`document.getElementById('position-title').textContent.includes('3,300')`);
   assert.ok((await evaluate(`document.querySelector('.position-card.unavailable')?.textContent`)).includes('not listed'));

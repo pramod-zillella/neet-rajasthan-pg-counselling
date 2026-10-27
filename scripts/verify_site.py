@@ -127,6 +127,9 @@ def main() -> None:
         )
     assert ahead_mix(round1_2025) == (1181, 742, 5, 156, 0)
     assert ahead_mix(merit26) == (800, 1225, 1, 57, 1)
+    assert (round1_2025[1199]["service_status"], round1_2025[1199]["neet_pg_air"]) == ("Non-Service", 24990)
+    assert merit26[1199]["service_status"] == "In-Service"
+    assert (merit26[1197]["state_merit_rank"], merit26[1197]["service_status"], merit26[1197]["neet_pg_air"]) == (1198, "Non-Service", 24779)
 
     for year in (2024, 2025):
         merit = {(r["round"], r["registration_id"]): r for r in rows_by_key[(year,"merit")]}

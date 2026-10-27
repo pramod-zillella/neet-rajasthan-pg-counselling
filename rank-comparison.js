@@ -10,9 +10,11 @@
     {key:'unknown-domicile', label:'Domicile not applicable'}
   ];
   let lists;
+  let currentRank = 2085;
   const params = new URLSearchParams(location.search);
   const requestedRank = Number(params.get('rank'));
   if (params.has('rank') && Number.isInteger(requestedRank) && requestedRank >= 1 && requestedRank <= 3706) byId('rank-input').value = requestedRank;
+  if (['other', 'rajasthan'].includes(params.get('ns'))) byId('nonservice-domicile').value = params.get('ns');
 
   function groupOf(row) {
     if (row.domicile === 'Not Applicable') return 'unknown-domicile';
@@ -40,7 +42,40 @@
     }).join('');
     return `<div class="rank-bar-row"><div><strong>${year}</strong><span>${format(total)} ahead</span></div><div class="rank-bar-track" role="img" aria-label="${year}: ${groups.map(group => `${group.label} ${format(counts[group.key])}`).join(', ')}">${segments}</div></div>`;
   }
+  function latestNonService(rows, rank, scope) {
+    if (rank > rows.length) return null;
+    for (let index = rank - 1; index >= 0; index--) {
+      const row = rows[index];
+      if (row.service_status !== 'Non-Service') continue;
+      if (scope === 'rajasthan' && row.domicile !== 'Rajasthan') continue;
+      if (scope === 'other' && (row.domicile === 'Rajasthan' || row.domicile === 'Not Applicable')) continue;
+      return row;
+    }
+    return null;
+  }
+  function renderNonService() {
+    if (!lists) return;
+    const scope = byId('nonservice-domicile').value;
+    const matched = (year, rank) => latestNonService(lists[year], rank, scope);
+    const cells = (year, row) => row
+      ? `<td class="numeric">${format(row.state_merit_rank)}</td><td class="numeric"><a href="documents/${year}/merit/round-1.pdf#page=${row.pdf_page}" target="_blank" rel="noopener" aria-label="${year} AIR ${format(row.neet_pg_air)}; open source PDF page ${row.pdf_page}">${format(row.neet_pg_air)}</a></td>`
+      : '<td class="numeric muted">—</td><td class="numeric muted">—</td>';
+    byId('nonservice-milestones').innerHTML = Array.from({length: 18}, (_, index) => {
+      const milestone = (index + 1) * 200;
+      return `<tr${Math.ceil(currentRank / 200) * 200 === milestone ? ' class="rank-current-milestone"' : ''}><th scope="row"><button type="button" class="milestone-button" data-milestone="${milestone}" aria-label="Compare state rank ${format(milestone)}">${format(milestone)}</button></th>${cells(2025, matched(2025, milestone))}${cells(2026, matched(2026, milestone))}</tr>`;
+    }).join('');
+    const summary = year => {
+      const row = matched(year, currentRank);
+      if (currentRank > lists[year].length) return `${year}: rank ${format(currentRank)} is beyond this list`;
+      return row ? `${year}: AIR ${format(row.neet_pg_air)} at actual state rank ${format(row.state_merit_rank)}` : `${year}: no matching Non-Service entry by this rank`;
+    };
+    byId('nonservice-reading').textContent = `At or before state rank ${format(currentRank)} — ${summary(2025)}; ${summary(2026)}. The matched ranks may differ from the rank entered above.`;
+    const url = new URL(location.href);
+    if (scope === 'all') url.searchParams.delete('ns'); else url.searchParams.set('ns', scope);
+    history.replaceState(null, '', url.pathname + url.search + url.hash);
+  }
   function render(rank) {
+    currentRank = rank;
     const data25 = lists[2025], data26 = lists[2026];
     const has26 = rank <= data26.length;
     const ahead25 = countsAhead(data25, rank), ahead26 = has26 ? countsAhead(data26, rank) : null;
@@ -58,7 +93,16 @@
     const url = new URL(location.href);
     if (rank === 2085) url.searchParams.delete('rank'); else url.searchParams.set('rank', rank);
     history.replaceState(null, '', url.pathname + url.search + url.hash);
+    renderNonService();
   }
+  byId('nonservice-domicile').addEventListener('change', renderNonService);
+  byId('nonservice-milestones').addEventListener('click', event => {
+    const button = event.target.closest('[data-milestone]');
+    if (!button) return;
+    const rank = Number(button.dataset.milestone);
+    byId('rank-input').value = rank;
+    render(rank);
+  });
   byId('rank-form').addEventListener('submit', event => {
     event.preventDefault();
     const value = Number(byId('rank-input').value);
