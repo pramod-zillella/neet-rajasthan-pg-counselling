@@ -4,7 +4,7 @@ A standalone, static GitHub Pages archive for **NEET-PG 2024 / academic session 
 
 The site needs no account, API key or server-side database. Open the [home page](index.html) on GitHub Pages. For local preview, run `python -m http.server 8000` in this directory and visit `http://localhost:8000/`. Browsers generally block `fetch()` from `file://`, so double-clicking an HTML file will not load the document register.
 
-Selecting categorical options updates the page URL, so you can copy a link to the same year, rounds and selected filters. The search box and numeric ranges apply to the current view and are not saved in that link. A blank checkbox selection means all values; use **Clear** inside a menu to return to all values.
+Selecting categorical options updates the page URL, so you can copy a link to the same year, rounds and selected filters. Type directly into any categorical filter to see matching options; selected values appear as removable chips. You can select several options, and **All Except Rajasthan** remains available in the domicile search. The table-wide search box and numeric ranges apply to the current view and are not saved in that link. No selected chips means all values; use **Clear selection** in the matching-options panel to return to all values.
 
 ## What is included
 
