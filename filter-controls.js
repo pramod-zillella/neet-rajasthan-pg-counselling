@@ -6,8 +6,8 @@
   function matches(selected, value) {
     if (!selected.size) return true;
     if (selected.has(NON_RAJASTHAN)) {
-      return value !== null && value !== undefined && String(value).trim() !== '' &&
-        String(value).trim().toLocaleLowerCase() !== 'rajasthan';
+      const domicile = String(value ?? '').trim().toLocaleLowerCase();
+      return domicile !== '' && domicile !== 'rajasthan' && domicile !== 'not applicable';
     }
     return selected.has(value) || ((value === null || value === undefined || value === '') && selected.has(UNREPORTED));
   }

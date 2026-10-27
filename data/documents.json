@@ -1,7 +1,23 @@
 {
   "built": "2026-10-27",
-  "sourceSnapshot": "24 Oct 2026 (2024 files); 20 Oct 2026 (2025 files)",
+  "sourceSnapshot": "24 Oct 2026 (2024 files); 20 Oct 2026 (2025 files); 27 Oct 2026 (2026 Round 1 merit)",
   "documents": [
+    {
+      "year": 2026,
+      "kind": "merit",
+      "round": "Round 1",
+      "roundKey": "round-1",
+      "order": 1,
+      "date": "27 Oct 2026",
+      "pages": 138,
+      "entries": 3160,
+      "path": "documents/2026/merit/round-1.pdf",
+      "status": "available",
+      "sha256": "81af5fb564301768820020bd640bd01d4dbb9066f7bcc53f04b8e7e6d3dc8c3f",
+      "sourceUrl": "https://pg.neetrajasthan.com/notifications/1793106735874.pdf",
+      "archiveUrl": null,
+      "note": "Provisional Round 1 state merit list. Shows NEET-PG AIR, state merit, service status and marks; later revisions may follow."
+    },
     {
       "year": 2025,
       "kind": "allotment",

@@ -47,6 +47,8 @@ ALLOT_2025 = {
     "drive-r3-allotment": ("Round 3", "round-3", 3, "Date unverified", 2145),
     "drive-r4-allotment": ("Stray vacancy", "stray", 4, "25 Feb 2026", 220),
 }
+MERIT_2026_SHA256 = "81af5fb564301768820020bd640bd01d4dbb9066f7bcc53f04b8e7e6d3dc8c3f"
+MERIT_2026_SOURCE = "https://pg.neetrajasthan.com/notifications/1793106735874.pdf"
 
 
 def csv_rows(path: Path) -> list[dict[str, str]]:
@@ -173,11 +175,23 @@ def build(source_root: Path) -> list[dict]:
             "note": note,
         })
 
+    merit26 = ROOT / "documents" / "2026" / "merit" / "round-1.pdf"
+    if digest(merit26) != MERIT_2026_SHA256:
+        raise ValueError(f"2026 merit PDF differs from verified Board copy: {merit26}")
+    docs.append({
+        "year": 2026, "kind": "merit", "round": "Round 1", "roundKey": "round-1",
+        "order": 1, "date": "27 Oct 2026", "pages": 138, "entries": 3160,
+        "path": merit26.relative_to(ROOT).as_posix(), "status": "available",
+        "sha256": MERIT_2026_SHA256, "sourceUrl": MERIT_2026_SOURCE,
+        "archiveUrl": None,
+        "note": "Provisional Round 1 state merit list. Shows NEET-PG AIR, state merit, service status and marks; later revisions may follow.",
+    })
+
     docs.sort(key=lambda item: (-item["year"], item["kind"], item["order"]))
     (ROOT / "data").mkdir(parents=True, exist_ok=True)
     manifest = {
         "built": date.today().isoformat(),
-        "sourceSnapshot": "24 Oct 2026 (2024 files); 20 Oct 2026 (2025 files)",
+        "sourceSnapshot": "24 Oct 2026 (2024 files); 20 Oct 2026 (2025 files); 27 Oct 2026 (2026 Round 1 merit)",
         "documents": docs,
     }
     (ROOT / "data" / "documents.json").write_text(

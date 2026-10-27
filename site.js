@@ -20,14 +20,15 @@
   const cache = new Map();
   const pageParams = new URLSearchParams(location.search);
   const requestedRounds = (pageParams.get('round') || '').split(',').filter(Boolean);
-  const requestedYears = (pageParams.get('year') || '2025').split(',').filter(year => ['2024','2025'].includes(year));
+  const availableYears = kind === 'merit' ? ['2024','2025','2026'] : ['2024','2025'];
+  const requestedYears = (pageParams.get('year') || (kind === 'merit' ? '2026' : '2025')).split(',').filter(year => availableYears.includes(year));
   const yearFilter = new MultiFilter('year-filter', {label:'Exam year', allLabel:'All years', onChange:() => {
     searchEl.value = '';
     Object.values(ranges).forEach(control => { control.value = ''; });
     Object.values(filters).filter(Boolean).forEach(filter => filter.clear(false));
     loadYears();
   }});
-  yearFilter.setOptions(['2024','2025']);
+  yearFilter.setOptions(availableYears);
   yearFilter.setSelected(requestedYears);
   const roundFilter = new MultiFilter('round-filter', {label:'Round', allLabel:kind === 'merit' ? 'All rounds' : 'All recovered rounds', onChange:applyFilters});
   const makeFilter = (id,label,allLabel,special=false) => byId(id) ? new MultiFilter(id,{label,allLabel,special,onChange:applyFilters}) : null;
@@ -37,10 +38,12 @@
     seat_type:makeFilter('seat-filter','Allotted seat type','All seat types'),
     domicile:makeFilter('domicile-filter','Domicile','All domiciles',true),
     considered_category:makeFilter('category-filter','Provisional considered category','All categories'),
+    additional_category_filled:makeFilter('additional-filter','Additional category (filled)','All additional categories'),
+    additional_category_verified:makeFilter('verified-filter','Additional category (verified)','All verification statuses'),
     service_status:makeFilter('service-filter','Service / non-service','All service statuses')
   };
-  const activeYears = () => yearFilter.values().length ? yearFilter.values() : ['2025','2024'];
-  const yearLabel = () => activeYears().length === 1 ? activeYears()[0] : '2024-2025';
+  const activeYears = () => yearFilter.values().length ? yearFilter.values() : [...availableYears];
+  const yearLabel = () => activeYears().slice().sort().join('-');
 
   const safe = value => String(value ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
   const fmt = value => value === null || value === undefined || value === '' ? '—' : typeof value === 'number' ? value.toLocaleString('en-US') : safe(value);
@@ -49,17 +52,20 @@
 
   function columns() {
     const years = activeYears();
-    const has2024 = years.includes('2024'), has2025 = years.includes('2025');
+    const has2024 = years.includes('2024'), has2025 = years.includes('2025'), has2026 = years.includes('2026');
     const commonMerit = [
       ['year','Year'],
       ['round','Round'], ['registration_id','Registration ID'],
       ...(has2024 ? [['list_serial','List no.']] : []),
       ['state_merit_rank','State merit'],
-      ...(has2025 ? [['neet_pg_air','NEET-PG AIR']] : []),
-      ['domicile','Domicile'], ['filled_category','Filled category'],
+      ...(has2025 || has2026 ? [['neet_pg_air','NEET-PG AIR']] : []),
+      ['domicile','Domicile'],
+      ...(has2024 || has2025 ? [['filled_category','Filled category']] : []),
       ['considered_category','Provisional considered category'],
+      ...(has2026 ? [['additional_category_filled','Additional category (filled)'],['additional_category_verified','Additional category (verified)']] : []),
       ['service_status','Service / non-service'],
-      ...(has2025 ? [['neet_marks','NEET marks'],['bonus_marks','Bonus marks'],['total_marks','Total marks']] : []),
+      ...(has2026 ? [['in_service_experience_years','In-service years (rural)']] : []),
+      ...(has2025 || has2026 ? [['neet_marks','NEET marks'],['bonus_marks','Bonus marks'],['total_marks','Total marks']] : []),
       ['pdf_page','Source PDF']
     ];
     const commonAllot = [
@@ -111,13 +117,15 @@
       filter.setSelected(preferredFilters[key] || []);
     }
     for (const control of [ranges.minAir, ranges.maxAir]) {
-      control.disabled = !years.includes(2025);
-      if (!years.includes(2025)) control.value = '';
+      control.disabled = !years.some(year => year >= 2025);
+      if (control.disabled) control.value = '';
     }
-    hintEl.textContent = years.length === 2
-      ? 'Showing both exam years. The 2024 records have no published AIR; compare ranks within each year and round.'
+    hintEl.textContent = years.length > 1
+      ? (kind === 'merit' ? 'Showing multiple exam years. Compare ranks within the same year and round; 2024 has no published AIR and 2026 Round 1 is provisional.' : 'Showing both exam years. The 2024 allotments have no published AIR; compare ranks within each year and round.')
       : years[0] === 2024
       ? (kind === 'merit' ? '2024 has state merit only; AIR is not in these PDFs.' : '2024 Round 1 uses combined merit; later rounds use state merit after weightage. AIR is not shown.')
+      : years[0] === 2026
+      ? '2026 Round 1 is provisional. The Board prints both NEET-PG AIR and state merit, plus service and bonus marks.'
       : (kind === 'merit' ? '2025 shows both state merit and NEET-PG AIR.' : '2025 AIR comes from the matching round-specific merit list; Round 3 allotment coverage is incomplete.');
     updateUrl();
   }
@@ -148,7 +156,7 @@
         const url = sourceLink(row);
         return `<td><a href="${safe(url)}" target="_blank" rel="noopener" aria-label="Open source PDF page ${row.pdf_page}">p. ${fmt(row.pdf_page)} ↗</a></td>`;
       }
-      const numeric = ['list_serial','state_merit_rank','merit_number','neet_pg_air','neet_marks','bonus_marks','total_marks'].includes(key);
+      const numeric = ['list_serial','state_merit_rank','merit_number','neet_pg_air','in_service_experience_years','neet_marks','bonus_marks','total_marks'].includes(key);
       return `<td class="${numeric ? 'numeric' : ''}${key === 'college' || key === 'course' ? ' descriptive' : ''}">${fmt(row[key])}</td>`;
     }).join('')}</tr>`).join('');
     bodyEl.insertAdjacentHTML('beforeend', markup);
@@ -239,7 +247,10 @@
       applyFilters();
     } catch (error) {
       countEl.textContent = 'Records unavailable';
-      bodyEl.innerHTML = `<tr><td class="empty-cell">Could not load the table. Please refresh, or download the <a href="data/Rajasthan-NEET-PG-2024-2025-filterable.xlsx">Excel workbook</a>.</td></tr>`;
+      const workbook = kind === 'merit' && activeYears().includes('2026') && activeYears().length === 1
+        ? 'data/Rajasthan-NEET-PG-2026-Round-1-merit.xlsx'
+        : 'data/Rajasthan-NEET-PG-2024-2025-filterable.xlsx';
+      bodyEl.innerHTML = `<tr><td class="empty-cell">Could not load the table. Please refresh, or download the <a href="${workbook}">Excel workbook</a>.</td></tr>`;
       console.error('Unable to load records', error);
     }
   }
