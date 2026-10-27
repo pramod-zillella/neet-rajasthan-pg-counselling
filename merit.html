@@ -1,9 +1,44 @@
 <!doctype html>
 <html lang="en">
-<head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><meta name="theme-color" content="#102c3a"><meta name="description" content="Browse Rajasthan NEET-PG 2024 and 2025 state merit lists by round, with PDF previews and source provenance."><title>State merit lists · Rajasthan NEET-PG archive</title><link rel="stylesheet" href="styles.css"><script defer src="site.js"></script></head>
-<body data-page="merit"><a class="skip" href="#main">Skip to content</a><header class="site-header"><div class="wrap header-inner"><a class="brand" href="index.html" aria-label="Rajasthan NEET-PG archive home"><span class="brand-mark">RJ</span><span>Rajasthan <small>NEET-PG archive</small></span></a><nav aria-label="Main navigation"><a href="index.html">Overview</a><a class="active" aria-current="page" href="merit.html">Merit lists</a><a href="allotments.html">Allotments</a></nav></div></header>
-<main id="main" class="wrap collection"><div class="breadcrumb"><a href="index.html">Overview</a><span aria-hidden="true">/</span><span>Merit lists</span></div><div class="collection-heading"><div><p class="eyebrow dark">Document collection / 01</p><h1>State merit lists</h1><p>Browse the Board-issued lists for the 2024–25 and 2025–26 academic sessions. Open the PDF to inspect individual records and its original headings.</p></div><div class="heading-symbol" aria-hidden="true">01</div></div>
-<div class="insight"><span class="insight-icon" aria-hidden="true">i</span><p><strong>Rank labels differ by year.</strong> The 2024 lists give state merit numbers but no explicit NEET-PG All India Rank column. The 2025 lists show both. State ranks can reflect in-service weightage; compare within the correct year and round.</p></div>
-<section class="browser" aria-labelledby="browse-title"><div class="browser-head"><div><p class="eyebrow dark">Find a list</p><h2 id="browse-title">Browse documents</h2></div><p id="result-count" role="status" aria-live="polite">Loading documents…</p></div><div class="filters"><label>Exam year<select id="year-filter"><option value="2025">2025 · session 2025–26</option><option value="2024">2024 · session 2024–25</option></select></label><label>Round<select id="round-filter"><option value="all">All rounds</option></select></label><label>Search documents<input id="search-filter" type="search" placeholder="Round or note" autocomplete="off"></label></div><div id="document-list" class="document-list"></div></section>
-<section class="footnote-panel"><h2>About this collection</h2><p>The main 2024 Round 1–3, revised Stray, and Special Stray merit PDFs were checked against the Internet Archive file digests and complete printed page sequences. An earlier 28 February 2025 provisional Stray version is linked beside the revised version.</p><p>All four 2025 merit PDFs are provisional recovered public copies. Candidate records can recur across rounds; the number of listed entries is not a count of distinct applicants or final admissions. Full source URLs and SHA-256 hashes are available on each document card.</p></section>
-</main><dialog id="pdf-dialog" aria-label="PDF preview"><div class="dialog-head"><strong id="dialog-title">PDF preview</strong><button id="close-dialog" type="button" aria-label="Close preview">×</button></div><iframe id="pdf-frame" title="Document PDF preview"></iframe><div class="dialog-foot"><p>If the browser cannot display the PDF, open it in a new tab.</p><a id="dialog-open" class="button primary" target="_blank" rel="noopener" href="#">Open PDF ↗</a></div></dialog><footer class="site-footer"><div class="wrap"><p>Independent research archive · Verify later Board notices before relying on a historical result.</p><p><a href="index.html">Overview</a><a href="allotments.html">Allotments</a><a href="data/documents.json">Document register</a></p></div></footer></body></html>
+<head>
+  <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#102c3a">
+  <meta name="description" content="Filter, sort and export Rajasthan NEET-PG 2024 and 2025 state merit lists; open each source PDF at its row's page.">
+  <title>Filterable merit lists · Rajasthan NEET-PG archive</title>
+  <link rel="stylesheet" href="styles.css"><script defer src="site.js"></script>
+</head>
+<body data-page="merit">
+  <a class="skip" href="#main">Skip to content</a>
+  <header class="site-header"><div class="wrap header-inner"><a class="brand" href="index.html" aria-label="Rajasthan NEET-PG archive home"><span class="brand-mark">RJ</span><span>Rajasthan <small>NEET-PG archive</small></span></a><nav aria-label="Main navigation"><a href="index.html">Overview</a><a class="active" aria-current="page" href="merit.html">Merit lists</a><a href="allotments.html">Allotments</a></nav></div></header>
+  <main id="main" class="wrap collection">
+    <div class="breadcrumb"><a href="index.html">Overview</a><span aria-hidden="true">/</span><span>Merit lists</span></div>
+    <div class="collection-heading"><div><p class="eyebrow dark">Filterable records / 01</p><h1>State merit lists</h1><p>Search and sort the published round-specific records. Export the filtered rows, or open a source PDF at the exact page.</p></div><div class="heading-symbol" aria-hidden="true">01</div></div>
+    <div class="insight"><span class="insight-icon" aria-hidden="true">i</span><p><strong>State merit and AIR are different.</strong> The 2024 lists do not explicitly show NEET-PG All India Rank, so 2024 AIR cells remain blank. The 2025 lists show both. Names and NEET roll numbers are omitted from the filterable data.</p></div>
+    <section class="browser" aria-labelledby="browse-title">
+      <div class="browser-head"><div><p class="eyebrow dark">Explore merit</p><h2 id="browse-title">Merit records</h2></div><p id="result-count" role="status" aria-live="polite">Loading records…</p></div>
+      <div class="filters primary-filters">
+        <label>Exam year<select id="year-filter"><option value="2025">2025 · session 2025–26</option><option value="2024">2024 · session 2024–25</option></select></label>
+        <label>Round<select id="round-filter"><option value="all">All rounds</option></select></label>
+        <label>Search registration ID<input id="search-filter" type="search" placeholder="For example, PM0218" autocomplete="off"></label>
+      </div>
+      <details class="advanced-filters" open><summary>More filters <span>domicile, category, service and rank</span></summary>
+        <div class="filters extra-filters">
+          <label>Domicile<select id="domicile-filter"><option value="all">All domiciles</option></select></label>
+          <label>Provisional considered category<select id="category-filter"><option value="all">All categories</option></select></label>
+          <label>Service / non-service<select id="service-filter"><option value="all">All service statuses</option></select></label>
+          <label>State merit from<input id="min-rank" type="number" min="1" inputmode="numeric" placeholder="Minimum"></label>
+          <label>State merit to<input id="max-rank" type="number" min="1" inputmode="numeric" placeholder="Maximum"></label>
+          <label>NEET-PG AIR from<input id="min-air" type="number" min="1" inputmode="numeric" placeholder="2025 only"></label>
+          <label>NEET-PG AIR to<input id="max-air" type="number" min="1" inputmode="numeric" placeholder="2025 only"></label>
+        </div>
+      </details>
+      <div class="table-toolbar"><p id="table-hint">Select a year to explore the data.</p><div><button id="reset-filters" class="button outline" type="button">Clear filters</button><button id="download-csv" class="button primary" type="button">Export filtered CSV</button><a class="button outline" href="data/Rajasthan-NEET-PG-2024-2025-filterable.xlsx" download>Download full Excel</a></div></div>
+      <div class="data-scroll" role="region" aria-label="Filterable merit table" tabindex="0"><table id="results-table"><thead id="table-head"></thead><tbody id="table-body"></tbody></table></div>
+      <div id="scroll-sentinel" class="scroll-sentinel" aria-hidden="true"></div><p class="table-foot">The table loads more rows as you scroll. Sorting and CSV export use <em>all</em> filtered records, including rows not yet displayed.</p>
+    </section>
+    <section class="source-library" aria-labelledby="sources-title"><div class="section-heading"><div><p class="eyebrow dark">Evidence</p><h2 id="sources-title">Original merit-list PDFs</h2></div><p>Each table row links to its physical page. Source copies, dates and verification details are below.</p></div><div id="source-list" class="source-list"></div></section>
+    <section class="footnote-panel"><h2>Method and limits</h2><p>2024 merit fields were extracted from the verified archived Board PDFs. For 2025, the AIR and rank values come from the previously validated merit research, while domicile and provisional considered category were read from the same-round merit PDFs. Round lists overlap; counts are records, not distinct applicants or final admissions.</p><p>The 2024 domicile field uses the Board’s labels “RAJASTHAN” and “OTHER”; 2025 reports named states. The provisional considered category is preserved as printed, so labels such as OBC and OBC NCL remain distinct. Five 2024 merit rows have no service label in the source PDF and remain unreported rather than being classified as non-service.</p></section>
+  </main>
+  <dialog id="pdf-dialog" aria-label="PDF preview"><div class="dialog-head"><strong id="dialog-title">PDF preview</strong><button id="close-dialog" type="button" aria-label="Close preview">×</button></div><iframe id="pdf-frame" title="Document PDF preview"></iframe><div class="dialog-foot"><p>If the browser cannot display the PDF, open it in a new tab.</p><a id="dialog-open" class="button primary" target="_blank" rel="noopener" href="#">Open PDF ↗</a></div></dialog>
+  <footer class="site-footer"><div class="wrap"><p>Independent historical research archive · Confirm later Board notices before making a counselling decision.</p><p><a href="index.html">Overview</a><a href="allotments.html">Allotments</a><a href="data/documents.json">Source register</a></p></div></footer>
+</body></html>
