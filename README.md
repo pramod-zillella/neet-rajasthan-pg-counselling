@@ -31,6 +31,19 @@ The 2024 allotted seat-type label is parsed from the institution suffix in the B
 
 Original public Board-issued PDFs remain hosted unchanged as evidence. The private research cache is not published. The fuller research notes remain in the local `neet-specialty-knowledge-base/exports` source directory.
 
+## Round 1 seat growth, 2024 to 2026
+
+The [seat-growth page](growth.html) compares MD/MS seats initially offered in Round 1 by college and branch. It supports multi-select college and branch filters, change filters, sorting, filtered CSV and a [full Excel workbook](data/Rajasthan-NEET-PG-2024-2026-seat-growth.xlsx). All seat-type columns within the same college and branch are summed once. Later-round vacancy snapshots and 2024 DNB/Diploma seats are excluded from growth calculations.
+
+| Comparable scope | 2024 | 2025 | 2026 |
+| --- | ---: | ---: | ---: |
+| All MD/MS colleges in the verified Rajasthan matrices | 2,008 | 2,378 | Unverified private component |
+| Government, RUHS-CMS and society colleges | 945 | 980 | 990 provisional |
+
+The full MD/MS total rose **370** from 2024 to 2025. Of this net change, **59 seats** are at colleges absent from the 2024 matrix (Dr S S Tantia 54, ESIC Alwar 5), and **311** are net changes at existing colleges. The government/RUHS/society total rose **35** from 2024 to 2025 and **10** from 2025 to the provisional 2026 matrix.
+
+The Rajasthan Board's [2026 Round 1 MD/MS attachment](https://pg.neetrajasthan.com/notifications/1792388159259.pdf) includes a 2026 government/RUHS/society matrix on PDF page 1. **PDF page 2 is explicitly headed as the 2025 private-college matrix**. Its 2025 numbers are excluded; 2026 private figures and a 2026 all-college growth total are left blank until an authentic current private matrix is available. The retained official PDF is [`documents/2026/matrix/round-1-medical.pdf`](documents/2026/matrix/round-1-medical.pdf), SHA-256 `95f9bb153604f332b8394ed14e2b27046077a4a99736adea6425652bc3da2e09`. Page 1 is dated 16 October 2026 and marked provisional, so later revisions can change its totals. The explicit branch-alias mapping and row/printed-total checks are in [`scripts/build_growth.py`](scripts/build_growth.py). The two 2024 Anatomy labels and two Transfusion Medicine labels are combined to match the later combined programme labels. “New college” means absent from the verified 2024 Round 1 matrix, not founded in 2025.
+
 ## Refresh the site
 
 The source research packs live in a sibling `neet-specialty-knowledge-base/exports` directory. Install the extraction dependencies, then rebuild and verify:
@@ -40,6 +53,7 @@ python -m pip install -r requirements.txt
 python scripts/build_site.py
 python scripts/build_tables.py
 python scripts/build_matrix.py
+python scripts/build_growth.py
 python scripts/verify_site.py
 ```
 

@@ -14,6 +14,7 @@ from openpyxl import load_workbook
 
 from labels import VALID_2025_COLLEGES, VALID_2025_COURSES
 from build_matrix import FULL_2025_BRANCH, TRUNCATED_2025_BRANCH
+from build_growth import extract_2026, PDF_2026_SHA256
 
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -171,7 +172,33 @@ def main() -> None:
         assert sheet.cell(2, page_col).hyperlink.target.startswith("https://pramod-zillella.github.io/")
     assert len(list((ROOT / "documents" / "2024" / "matrix").glob("*.pdf"))) == 10
     assert len(list((ROOT / "documents" / "2025" / "matrix").glob("*.pdf"))) == 4
-    print("Verified 40,624 merit/allotment rows, 17,064 matrix cells, round/AIR joins, Excel links, 31 PDFs and site links.")
+    assert len(list((ROOT / "documents" / "2026" / "matrix").glob("*.pdf"))) == 1
+    assert sum(r["seats"] for r in extract_2026()) == 990
+    growth = json.loads((ROOT / "data" / "seat-growth-2024-2026.json").read_text(encoding="utf-8"))
+    growth_rows = growth["rows"]
+    assert len(growth_rows) == 384
+    assert growth["meta"]["source_2026_sha256"] == PDF_2026_SHA256
+    assert growth["meta"]["totals_all_2024_2025"] == [2008, 2378]
+    assert growth["meta"]["totals_government_2024_2025_2026"] == [945, 980, 990]
+    assert growth["meta"]["new_college_seats_2025"] == 59
+    assert growth["meta"]["existing_college_net_change_2025"] == 311
+    assert [sum(row[f"seats_{year}"] or 0 for row in growth_rows) for year in (2024, 2025, 2026)] == [2008, 2378, 990]
+    assert sum(row["change_2024_2025"] for row in growth_rows) == 370
+    assert sum(row["change_2025_2026"] or 0 for row in growth_rows) == 10
+    assert all(row["seats_2026"] is None and row["change_2025_2026"] is None and not row["source_2026"]
+               for row in growth_rows if row["group"] == "Private")
+    assert all(row["source_2026"].endswith("#page=1") for row in growth_rows if row["seats_2026"] is not None)
+    with (ROOT / "data" / "seat-growth-2024-2026.csv").open(encoding="utf-8-sig", newline="") as stream:
+        exported = list(csv.DictReader(stream))
+        assert len(exported) == len(growth_rows)
+        assert [row["institution"] for row in exported] == [row["institution"] for row in growth_rows]
+        assert all(row["seats_2026"] == "" for row in exported if row["group"] == "Private")
+    growth_book = load_workbook(ROOT / "data" / "Rajasthan-NEET-PG-2024-2026-seat-growth.xlsx", read_only=False)
+    sheet = growth_book["Seat growth"]
+    assert sheet.max_row == len(growth_rows) + 1
+    assert [cell.value for cell in sheet[1]][3:8] == ["2024 seats", "2025 seats", "2026 seats", "2024 to 2025", "2025 to 2026"]
+    assert sheet.cell(2, 11).hyperlink.target.startswith("https://pramod-zillella.github.io/")
+    print("Verified 40,624 merit/allotment rows, 17,064 matrix cells, 384 growth rows, round/AIR joins, Excel links, 32 PDFs and site links.")
 
 
 if __name__ == "__main__":

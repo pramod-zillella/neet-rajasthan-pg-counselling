@@ -1,0 +1,46 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#102c3a">
+  <meta name="description" content="Compare Rajasthan NEET-PG Round 1 MD/MS seats by college and branch for 2024, 2025 and the verified 2026 government-college matrix.">
+  <title>Seat growth · Rajasthan NEET-PG archive</title>
+  <link rel="stylesheet" href="styles.css"><script defer src="filter-controls.js"></script><script defer src="growth.js"></script>
+</head>
+<body>
+  <a class="skip" href="#main">Skip to content</a>
+  <header class="site-header"><div class="wrap header-inner"><a class="brand" href="index.html" aria-label="Rajasthan NEET-PG archive home"><span class="brand-mark">RJ</span><span>Rajasthan <small>NEET-PG archive</small></span></a><nav aria-label="Main navigation"><a href="index.html">Overview</a><a href="merit.html">Merit lists</a><a href="allotments.html">Allotments</a><a href="matrix.html">Seat matrices</a><a class="active" aria-current="page" href="growth.html">Seat growth</a></nav></div></header>
+  <main id="main" class="wrap collection">
+    <div class="breadcrumb"><a href="index.html">Overview</a><span aria-hidden="true">/</span><span>Seat growth</span></div>
+    <div class="collection-heading"><div><p class="eyebrow dark">Round 1 comparison / 04</p><h1>Where did seats increase?</h1><p>Compare initially offered Rajasthan state-counselling MD/MS seats across 2024, 2025 and the verified 2026 government-side matrix. Filter by college and branch, then open the source PDF behind each number.</p></div><div class="heading-symbol" aria-hidden="true">04</div></div>
+
+    <div class="growth-stats" aria-label="Seat growth at a glance">
+      <div class="growth-stat"><span>All MD/MS · 2024 → 2025</span><strong>2,008 → 2,378</strong><small>+370 seats; new colleges +59, existing colleges net +311</small></div>
+      <div class="growth-stat"><span>Government / RUHS / Society</span><strong>945 → 980 → 990</strong><small>2024 → 2025 +35; 2025 → 2026 +10</small></div>
+      <div class="growth-stat"><span>2026 private colleges</span><strong>Awaiting verified data</strong><small>No 2026 private total or change is inferred</small></div>
+    </div>
+
+    <div class="insight caution growth-warning"><span class="insight-icon" aria-hidden="true">!</span><p><strong>2026 has partial coverage.</strong> The Rajasthan Board's <a href="documents/2026/matrix/round-1-medical.pdf#page=1" target="_blank" rel="noopener">2026 Round 1 attachment</a> has a 2026 government/RUHS/society matrix on page 1, but page 2 explicitly says <strong>2025 private colleges</strong>. This page excludes that old private page. A blank 2026 value means unverified, not zero. The 2026 page 1 figures are provisional and may be revised.</p></div>
+
+    <section class="browser" aria-labelledby="browse-title">
+      <div class="browser-head"><div><p class="eyebrow dark">Compare seats</p><h2 id="browse-title">College × branch</h2></div><p id="result-count" role="status" aria-live="polite">Loading records…</p></div>
+      <div class="filters primary-filters growth-filters">
+        <div id="group-filter"></div>
+        <div id="college-filter"></div>
+        <div id="branch-filter"></div>
+        <label>Search college or branch<input id="search-filter" type="search" placeholder="For example, Jaipur, ENT or Pathology" autocomplete="off"></label>
+      </div>
+      <div class="filters growth-extra-filters">
+        <label>Display<select id="view-filter"><option value="college">College totals</option><option value="detail">College × branch</option></select></label>
+        <label>Change to inspect<select id="change-filter"><option value="all">All changes</option><option value="increase-24">Increased 2024 → 2025</option><option value="decrease-24">Decreased 2024 → 2025</option><option value="increase-25">Increased 2025 → 2026</option><option value="decrease-25">Decreased 2025 → 2026</option><option value="new-25">Seats at new 2025 colleges</option></select></label>
+      </div>
+      <p class="filter-help">Start with government/RUHS/society colleges to see all three years. Clear the institution-group filter to include private colleges in the 2024 → 2025 comparison. Select multiple colleges and branches within each menu. College totals recalculate over branches matching your filters.</p>
+      <div class="table-toolbar"><p>Totals sum all printed seat-type columns within each college and branch. The same seat is counted once per year.</p><div><button id="reset-filters" class="button outline" type="button">Clear filters</button><button id="download-csv" class="button primary" type="button">Export filtered CSV</button><a class="button outline" href="data/Rajasthan-NEET-PG-2024-2026-seat-growth.xlsx" download>Download full Excel</a></div></div>
+      <div class="data-scroll" role="region" aria-label="Filterable Round 1 seat growth table" tabindex="0"><table id="results-table"><thead id="table-head"></thead><tbody id="table-body"></tbody></table></div>
+      <div id="scroll-sentinel" class="scroll-sentinel" aria-hidden="true"></div><p class="table-foot">More rows load as you scroll. Sorting and CSV export use every filtered record. Click a seat count to open its original Board PDF page.</p>
+    </section>
+
+    <section class="footnote-panel growth-method"><h2>How to read the comparison</h2><p>This compares <strong>Round 1 seats initially offered</strong>, not final sanctioned intake, admissions or seats left after later rounds. The 2024 government/RUHS/society total is 945, 2025 is 980 and the provisional 2026 page 1 total is 990. The full comparable MD/MS totals are 2,008 for 2024 and 2,378 for 2025. The 2024 collection also contains DNB/Diploma, but those programmes are excluded here because a verified 2025 DNB/Diploma matrix is absent.</p><p>The Board changed branch wording between 2024 and 2025. Short 2024 names such as “MS (ENT)” are matched to the fuller later label. The two 2024 Anatomy labels and two Transfusion Medicine labels are combined to match the later combined labels. The <a href="data/seat-growth-2024-2026.csv">full CSV</a> and <a href="data/Rajasthan-NEET-PG-2024-2026-seat-growth.xlsx">Excel workbook</a> retain source links. “New college” means a college absent from the verified 2024 Round 1 MD/MS matrix; it does not establish the college's actual founding year.</p><p>Source: <a href="documents/2024/matrix/round-1-medical.pdf">2024 Round 1 matrix</a>, <a href="documents/2025/matrix/round-1.pdf">2025 Round 1 matrix</a>, and <a href="documents/2026/matrix/round-1-medical.pdf#page=1">2026 provisional government page</a>. The downloaded 2026 attachment has SHA-256 <code>95f9bb153604f332b8394ed14e2b27046077a4a99736adea6425652bc3da2e09</code>; <a href="https://pg.neetrajasthan.com/notifications/1792388159259.pdf" target="_blank" rel="noopener noreferrer">open the current Board source</a> to check later revisions.</p></section>
+  </main>
+  <footer class="site-footer"><div class="wrap"><p>Independent research archive · Confirm the latest Board matrix before making a counselling decision.</p><p><a href="index.html">Overview</a><a href="matrix.html">Seat matrices</a></p></div></footer>
+</body></html>
