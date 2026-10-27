@@ -62,6 +62,7 @@
 .multi-select[open]{position:relative;z-index:20}
 .multi-select-summary{display:flex;align-items:center;justify-content:space-between;gap:9px;height:45px;margin-top:7px;padding:0 12px;border:1px solid #c7d7d9;border-radius:8px;background:#fff;color:var(--ink);font-size:.91rem;font-weight:500;cursor:pointer;list-style:none;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .multi-select-summary::-webkit-details-marker{display:none}
+.multi-select-summary::marker{content:''}
 .multi-select-summary::after{content:'⌄';flex:none;color:var(--deep);font-size:1.1rem}
 .multi-select-summary:focus-visible,.multi-select-search:focus-visible,.multi-select-option:focus-within{outline:2px solid var(--teal);outline-offset:2px}
 .has-selection .multi-select-summary{border-color:var(--teal);background:#f3fbf8;font-weight:650}
@@ -73,6 +74,10 @@
 .multi-select-option.special-option{background:#e8f5ee;font-weight:730;border-bottom:1px solid #cfe3da}
 .multi-select-option[hidden]{display:none}
 .filters .multi-select-option input{display:block;flex:none;width:16px;height:16px;margin:1px 0 0;padding:0;accent-color:var(--deep)}
+/* General filter rules also match controls nested inside the dropdown. */
+.filters label.multi-select-option{display:flex;align-items:flex-start;width:100%;margin:0;padding:8px 10px;color:var(--ink);font-size:.84rem;font-weight:500;letter-spacing:normal;line-height:1.35}
+.filters label.multi-select-option input[type="checkbox"]{display:block;flex:0 0 16px;width:16px;height:16px;min-width:16px;min-height:16px;max-width:16px;max-height:16px;margin:1px 0 0;padding:0;border:0;border-radius:3px;background:transparent;box-shadow:none;appearance:auto;accent-color:var(--deep)}
+.filters label.multi-select-option span{flex:1;min-width:0}
 .multi-select-actions{display:flex;justify-content:space-between;gap:8px;margin-top:9px}
 .multi-select-actions button{border:0;background:none;color:var(--deep);font-size:.78rem;font-weight:740;padding:4px 2px}
 .multi-select-actions button:hover{text-decoration:underline}
