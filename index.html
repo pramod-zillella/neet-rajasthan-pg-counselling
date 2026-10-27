@@ -4,8 +4,8 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="theme-color" content="#102c3a">
-  <meta name="description" content="Filter and export Rajasthan NEET-PG 2024 and 2025 state merit lists and seat allotments by round, rank, AIR, college, course and category.">
-  <title>Rajasthan NEET-PG archive · Merit lists & allotments</title>
+  <meta name="description" content="Filter and export Rajasthan NEET-PG 2024 and 2025 seat matrices, merit lists and allotments by round, college, course, category and rank.">
+  <title>Rajasthan NEET-PG archive · Seat matrices, merit and allotments</title>
   <link rel="stylesheet" href="styles.css">
 </head>
 <body>
@@ -13,7 +13,7 @@
   <header class="site-header">
     <div class="wrap header-inner">
       <a class="brand" href="index.html" aria-label="Rajasthan NEET-PG archive home"><span class="brand-mark">RJ</span><span>Rajasthan <small>NEET-PG archive</small></span></a>
-      <nav aria-label="Main navigation"><a class="active" aria-current="page" href="index.html">Overview</a><a href="merit.html">Merit lists</a><a href="allotments.html">Allotments</a></nav>
+      <nav aria-label="Main navigation"><a class="active" aria-current="page" href="index.html">Overview</a><a href="merit.html">Merit lists</a><a href="allotments.html">Allotments</a><a href="matrix.html">Seat matrices</a></nav>
     </div>
   </header>
   <main id="main">
@@ -22,8 +22,8 @@
         <div>
           <p class="eyebrow">Rajasthan state counselling · NEET-PG</p>
           <h1>Explore the records.<br><em>Check the source.</em></h1>
-          <p class="hero-copy">Filterable state merit and provisional allotment tables for the <strong>2024–25</strong> and <strong>2025–26</strong> academic sessions. Compare ranks, courses, colleges, seat types, domicile and category; open the Board-issued PDF at the supporting page.</p>
-          <div class="actions"><a class="button primary" href="merit.html">Explore merit <span aria-hidden="true">↗</span></a><a class="button light" href="allotments.html">Explore allotments <span aria-hidden="true">↗</span></a><a class="button light" href="data/Rajasthan-NEET-PG-2024-2025-filterable.xlsx" download>Download Excel ↓</a></div>
+          <p class="hero-copy">Filterable seat matrices, state merit and provisional allotments for the <strong>2024–25</strong> and <strong>2025–26</strong> academic sessions. Compare colleges and branches, then open the Board-issued PDF behind each row.</p>
+          <div class="actions"><a class="button primary" href="matrix.html">Explore seat matrices <span aria-hidden="true">↗</span></a><a class="button light" href="merit.html">Explore merit <span aria-hidden="true">↗</span></a><a class="button light" href="allotments.html">Explore allotments <span aria-hidden="true">↗</span></a></div>
         </div>
         <aside class="hero-aside" aria-label="At a glance">
           <div class="aside-title">At a glance</div>
@@ -41,17 +41,18 @@
         <div class="feature-grid">
           <a class="feature" href="merit.html"><span class="feature-icon" aria-hidden="true">01</span><h3>State merit lists</h3><p>Filter registration ID, state merit, domicile, provisional category and service. The 2025 lists also show NEET-PG AIR.</p><span class="feature-link">Explore merit table <span aria-hidden="true">→</span></span></a>
           <a class="feature" href="allotments.html"><span class="feature-icon" aria-hidden="true">02</span><h3>Seat allotments</h3><p>Compare colleges, courses and allotted seat types across rounds. The 2025 table adds matched AIR for every recovered allotment.</p><span class="feature-link">Explore allotment table <span aria-hidden="true">→</span></span></a>
+          <a class="feature" href="matrix.html"><span class="feature-icon" aria-hidden="true">03</span><h3>Seat matrices</h3><p>Filter available seats by year, round, college, branch, route and seat type. The source PDF sits one click from each row.</p><span class="feature-link">Explore seat matrix <span aria-hidden="true">→</span></span></a>
         </div>
       </section>
 
       <section class="availability" aria-labelledby="availability-title">
         <div class="section-heading"><div><p class="eyebrow dark">Coverage</p><h2 id="availability-title">Round-by-round availability</h2></div><p>The year denotes the NEET-PG exam; later counselling rounds may fall in the following calendar year.</p></div>
-        <div class="table-scroll"><table><thead><tr><th scope="col">Round</th><th scope="col">2024 merit</th><th scope="col">2024 allotment</th><th scope="col">2025 merit</th><th scope="col">2025 allotment</th></tr></thead><tbody>
-          <tr><th scope="row">Round 1</th><td><a href="merit.html?year=2024&amp;round=round-1">Filter rows</a></td><td><a href="allotments.html?year=2024&amp;round=round-1">Filter rows</a></td><td><a href="merit.html?year=2025&amp;round=round-1">Filter rows</a></td><td><a href="allotments.html?year=2025&amp;round=round-1">Filter rows</a></td></tr>
-          <tr><th scope="row">Round 2</th><td><a href="merit.html?year=2024&amp;round=round-2">Filter rows</a></td><td><a href="allotments.html?year=2024&amp;round=round-2">Filter rows</a></td><td><a href="merit.html?year=2025&amp;round=round-2">Filter rows</a></td><td><a href="allotments.html?year=2025&amp;round=round-2">Filter rows</a></td></tr>
-          <tr><th scope="row">Round 3</th><td><a href="merit.html?year=2024&amp;round=round-3">Filter rows</a></td><td><a href="allotments.html?year=2024&amp;round=round-3">Filter rows</a></td><td><a href="merit.html?year=2025&amp;round=round-3">Filter rows</a></td><td><a href="allotments.html?year=2025&amp;round=round-3">Partial rows*</a></td></tr>
-          <tr><th scope="row">Stray vacancy</th><td><a href="merit.html?year=2024&amp;round=stray">Filter rows</a></td><td><a href="allotments.html?year=2024&amp;round=stray">Source only</a></td><td><a href="merit.html?year=2025&amp;round=stray">Filter rows</a></td><td><a href="allotments.html?year=2025&amp;round=stray">Filter rows</a></td></tr>
-          <tr><th scope="row">Special stray</th><td><a href="merit.html?year=2024&amp;round=special-stray">Filter rows</a></td><td><a href="allotments.html?year=2024&amp;round=special-stray">Source only</a></td><td class="muted">Not in this collection</td><td class="muted">Not in this collection</td></tr>
+        <div class="table-scroll"><table><thead><tr><th scope="col">Round</th><th scope="col">2024 matrix</th><th scope="col">2024 merit</th><th scope="col">2024 allotment</th><th scope="col">2025 matrix</th><th scope="col">2025 merit</th><th scope="col">2025 allotment</th></tr></thead><tbody>
+          <tr><th scope="row">Round 1</th><td><a href="matrix.html?year=2024&amp;round=round-1">Filter seats</a></td><td><a href="merit.html?year=2024&amp;round=round-1">Filter rows</a></td><td><a href="allotments.html?year=2024&amp;round=round-1">Filter rows</a></td><td><a href="matrix.html?year=2025&amp;round=round-1">Filter seats</a></td><td><a href="merit.html?year=2025&amp;round=round-1">Filter rows</a></td><td><a href="allotments.html?year=2025&amp;round=round-1">Filter rows</a></td></tr>
+          <tr><th scope="row">Round 2</th><td><a href="matrix.html?year=2024&amp;round=round-2">Filter seats</a></td><td><a href="merit.html?year=2024&amp;round=round-2">Filter rows</a></td><td><a href="allotments.html?year=2024&amp;round=round-2">Filter rows</a></td><td><a href="matrix.html?year=2025&amp;round=round-2">Filter seats</a></td><td><a href="merit.html?year=2025&amp;round=round-2">Filter rows</a></td><td><a href="allotments.html?year=2025&amp;round=round-2">Filter rows</a></td></tr>
+          <tr><th scope="row">Round 3</th><td><a href="matrix.html?year=2024&amp;round=round-3">Filter seats</a></td><td><a href="merit.html?year=2024&amp;round=round-3">Filter rows</a></td><td><a href="allotments.html?year=2024&amp;round=round-3">Filter rows</a></td><td><a href="matrix.html?year=2025&amp;round=round-3">Filter seats</a></td><td><a href="merit.html?year=2025&amp;round=round-3">Filter rows</a></td><td><a href="allotments.html?year=2025&amp;round=round-3">Partial rows*</a></td></tr>
+          <tr><th scope="row">Stray vacancy</th><td><a href="matrix.html?year=2024&amp;round=stray">Filter seats</a></td><td><a href="merit.html?year=2024&amp;round=stray">Filter rows</a></td><td><a href="allotments.html?year=2024&amp;round=stray">Source only</a></td><td><a href="matrix.html?year=2025&amp;round=stray">Filter seats</a></td><td><a href="merit.html?year=2025&amp;round=stray">Filter rows</a></td><td><a href="allotments.html?year=2025&amp;round=stray">Filter rows</a></td></tr>
+          <tr><th scope="row">Special stray</th><td><a href="matrix.html?year=2024&amp;round=special-stray">Filter seats</a></td><td><a href="merit.html?year=2024&amp;round=special-stray">Filter rows</a></td><td><a href="allotments.html?year=2024&amp;round=special-stray">Source only</a></td><td class="muted">Not in this collection</td><td class="muted">Not in this collection</td><td class="muted">Not in this collection</td></tr>
         </tbody></table></div>
         <p class="caption">*The recovered 2025 Round 3 allotment file has 74 physical pages, although its footers say “of 125”; completeness is not certified.</p>
       </section>
@@ -59,6 +60,6 @@
       <section class="guidance" aria-labelledby="read-title"><div><p class="eyebrow dark">Read responsibly</p><h2 id="read-title">What these records can—and cannot—tell you</h2></div><div class="guidance-grid"><p><strong>State merit is not AIR.</strong> The 2024 merit PDFs do not explicitly show NEET-PG All India Rank. The 2025 merit PDFs show both, but use the list for the matching round.</p><p><strong>An allotment is not a joined seat.</strong> These lists are provisional. Round counts overlap, and some later-round records are carried forward.</p><p><strong>Check the source before deciding.</strong> Original historical portals were unavailable during research; recovered documents came from archived Board PDFs and public mirrors. Later corrigenda may exist.</p></div></section>
     </div>
   </main>
-  <footer class="site-footer"><div class="wrap"><p>Independent research archive · Source snapshots recovered October 2026 · For decisions, confirm the applicable Board notices and institution instructions.</p><p><a href="merit.html">Merit lists</a><a href="allotments.html">Allotments</a><a href="data/documents.json">Document register</a></p></div></footer>
+  <footer class="site-footer"><div class="wrap"><p>Independent research archive · Source snapshots recovered October 2026 · For decisions, confirm the applicable Board notices and institution instructions.</p><p><a href="merit.html">Merit lists</a><a href="allotments.html">Allotments</a><a href="matrix.html">Seat matrices</a></p></div></footer>
 </body>
 </html>

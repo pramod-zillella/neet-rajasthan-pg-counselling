@@ -1,0 +1,45 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#102c3a">
+  <meta name="description" content="Filter Rajasthan NEET-PG 2024 and 2025 seat matrices by round, college, branch, route and seat type, with links to the Board PDFs.">
+  <title>Seat matrices · Rajasthan NEET-PG archive</title>
+  <link rel="stylesheet" href="styles.css"><script defer src="matrix.js"></script>
+</head>
+<body>
+  <a class="skip" href="#main">Skip to content</a>
+  <header class="site-header"><div class="wrap header-inner"><a class="brand" href="index.html" aria-label="Rajasthan NEET-PG archive home"><span class="brand-mark">RJ</span><span>Rajasthan <small>NEET-PG archive</small></span></a><nav aria-label="Main navigation"><a href="index.html">Overview</a><a href="merit.html">Merit lists</a><a href="allotments.html">Allotments</a><a class="active" aria-current="page" href="matrix.html">Seat matrices</a></nav></div></header>
+  <main id="main" class="wrap collection">
+    <div class="breadcrumb"><a href="index.html">Overview</a><span aria-hidden="true">/</span><span>Seat matrices</span></div>
+    <div class="collection-heading"><div><p class="eyebrow dark">Filterable records / 03</p><h1>Seat matrices</h1><p>Find the seats published for a college and branch in each Rajasthan counselling round. The 2024 archive includes MD/MS, Post-MBBS DNB and Diploma matrices; the verified 2025 matrix set covers MD/MS colleges.</p></div><div class="heading-symbol" aria-hidden="true">03</div></div>
+    <div class="insight caution"><span class="insight-icon" aria-hidden="true">!</span><p><strong>Read each round separately.</strong> Round 1 lists seats initially offered; later matrices are snapshots of vacant seats. A seat can recur or be added, so round totals must not be added together. “AIQ” in a 2024 private-college matrix and “AI” in 2025 are Rajasthan Board labels, not MCC allotments.</p></div>
+    <section class="browser" aria-labelledby="browse-title">
+      <div class="browser-head"><div><p class="eyebrow dark">Explore seats</p><h2 id="browse-title">College × branch × seat type</h2></div><p id="result-count" role="status" aria-live="polite">Loading records…</p></div>
+      <div class="filters primary-filters">
+        <label>Exam year<select id="year-filter"><option value="2025">2025 · session 2025–26</option><option value="2024">2024 · session 2024–25</option></select></label>
+        <label>Round<select id="round-filter"><option value="round-1">Round 1</option></select></label>
+        <label>Search college or branch<input id="search-filter" type="search" placeholder="For example, MGMC, ENT or Radio-Diagnosis" autocomplete="off"></label>
+      </div>
+      <details class="advanced-filters" open><summary>More filters <span>college, branch, route, seat type and seats</span></summary>
+        <div class="filters extra-filters">
+          <label>College / centre<select id="college-filter"><option value="all">All colleges</option></select></label>
+          <label>Course / branch<select id="branch-filter"><option value="all">All branches</option></select></label>
+          <label>Route<select id="route-filter"><option value="all">All routes</option></select></label>
+          <label>Institution type<select id="type-filter"><option value="all">All institution types</option></select></label>
+          <label>Seat type<select id="seat-filter"><option value="all">All seat types</option></select></label>
+          <label>Minimum seats<input id="min-seats" type="number" min="0" inputmode="numeric" placeholder="Any"></label>
+          <label>Maximum seats<input id="max-seats" type="number" min="0" inputmode="numeric" placeholder="Any"></label>
+          <label class="check-filter"><input id="show-zero" type="checkbox"> Show zero-seat rows</label>
+        </div>
+      </details>
+      <div class="table-toolbar"><p id="table-hint">Select a year and round. Zero-seat rows are hidden until requested.</p><div><button id="reset-filters" class="button outline" type="button">Clear filters</button><button id="download-csv" class="button primary" type="button">Export filtered CSV</button><a class="button outline" href="data/Rajasthan-NEET-PG-2024-2025-seat-matrices.xlsx" download>Download full Excel</a></div></div>
+      <div class="data-scroll" role="region" aria-label="Filterable seat matrix table" tabindex="0"><table id="results-table"><thead id="table-head"></thead><tbody id="table-body"></tbody></table></div>
+      <div id="scroll-sentinel" class="scroll-sentinel" aria-hidden="true"></div><p class="table-foot">The table loads more rows as you scroll. Sorting and CSV export use every filtered record; the Excel workbook includes zero-seat rows.</p>
+    </section>
+    <section class="source-library" aria-labelledby="sources-title"><div class="section-heading"><div><p class="eyebrow dark">Evidence</p><h2 id="sources-title">Original seat-matrix PDFs</h2></div><p>Each table row links to its PDF page. The 2024 copies were matched to their Internet Archive digests; 2025 copies were matched to the research source register.</p></div><div id="source-list" class="source-list"></div></section>
+    <section class="footnote-panel"><h2>Reading the matrix</h2><p>In 2024 government-college PDFs, the first seat column is printed “Govt.” in Round 1 and “Recog.” in later rounds; the second is printed “Mgmt.” These are grouped as State (Government) and State (Management) for filtering, while the exact printed label remains in the table and Excel. Private-college “AIQ”, “SQ” and “Mgmt.” columns are grouped as AI, State and Management. The “Total” columns are excluded from row totals to prevent double-counting.</p><p>The 2024 DNB PDF also lists Post-MBBS Diploma centres. Those seats have no quota split in the PDF and are labelled Programme total. The 2025 verified matrices cover medical-college MD/MS seats only; do not treat a missing 2025 DNB entry as zero seats.</p></section>
+  </main>
+  <dialog id="pdf-dialog" aria-label="PDF preview"><div class="dialog-head"><strong id="dialog-title">PDF preview</strong><button id="close-dialog" type="button" aria-label="Close preview">×</button></div><iframe id="pdf-frame" title="Document PDF preview"></iframe><div class="dialog-foot"><p>If the browser cannot display the PDF, open it in a new tab.</p><a id="dialog-open" class="button primary" target="_blank" rel="noopener" href="#">Open PDF ↗</a></div></dialog>
+  <footer class="site-footer"><div class="wrap"><p>Independent historical research archive · Confirm later Board notices before making a counselling decision.</p><p><a href="index.html">Overview</a><a href="merit.html">Merit lists</a><a href="allotments.html">Allotments</a></p></div></footer>
+</body></html>

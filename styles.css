@@ -49,3 +49,9 @@
 .source-actions code{font-size:.69rem;word-break:break-all}
 @media(max-width:900px){.extra-filters{grid-template-columns:repeat(2,minmax(0,1fr))}.table-toolbar{align-items:flex-start;flex-direction:column}.table-toolbar>div{justify-content:flex-start}}
 @media(max-width:680px){.extra-filters,.source-list{grid-template-columns:1fr}.advanced-filters summary span{display:block;margin-left:0}.table-toolbar>div{width:100%}.table-toolbar .button{flex:1}.source-library{margin-top:55px}}
+
+/* Seat-matrix controls */
+.filters .check-filter{display:flex;align-items:center;gap:9px;align-self:end;min-height:45px;padding:0 10px;border:1px solid #c7d7d9;border-radius:8px;background:#fff;font-size:.83rem;cursor:pointer}
+.filters .check-filter input{display:inline-block;width:17px;height:17px;margin:0;accent-color:var(--deep)}
+.site-header nav{flex-wrap:wrap}
+@media(min-width:1050px){.feature-grid{grid-template-columns:repeat(3,minmax(0,1fr))}.feature{padding:26px;min-height:285px}}
