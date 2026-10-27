@@ -5,7 +5,7 @@
   <meta name="theme-color" content="#102c3a">
   <meta name="description" content="Filter Rajasthan NEET-PG 2024 and 2025 seat matrices by round, college, branch, route and seat type, with links to the Board PDFs.">
   <title>Seat matrices · Rajasthan NEET-PG archive</title>
-  <link rel="stylesheet" href="styles.css"><script defer src="matrix.js"></script>
+  <link rel="stylesheet" href="styles.css"><script defer src="filter-controls.js"></script><script defer src="matrix.js"></script>
 </head>
 <body>
   <a class="skip" href="#main">Skip to content</a>
@@ -17,17 +17,18 @@
     <section class="browser" aria-labelledby="browse-title">
       <div class="browser-head"><div><p class="eyebrow dark">Explore seats</p><h2 id="browse-title">College × branch × seat type</h2></div><p id="result-count" role="status" aria-live="polite">Loading records…</p></div>
       <div class="filters primary-filters">
-        <label>Exam year<select id="year-filter"><option value="2025">2025 · session 2025–26</option><option value="2024">2024 · session 2024–25</option></select></label>
-        <label>Round<select id="round-filter"><option value="round-1">Round 1</option></select></label>
+        <div id="year-filter"></div>
+        <div id="round-filter"></div>
         <label>Search college or branch<input id="search-filter" type="search" placeholder="For example, MGMC, ENT or Radio-Diagnosis" autocomplete="off"></label>
       </div>
+      <p class="filter-help">Select several years, rounds, colleges or branches within each filter. Seat totals appear only when one year and one round are selected.</p>
       <details class="advanced-filters" open><summary>More filters <span>college, branch, route, seat type and seats</span></summary>
         <div class="filters extra-filters">
-          <label>College / centre<select id="college-filter"><option value="all">All colleges</option></select></label>
-          <label>Course / branch<select id="branch-filter"><option value="all">All branches</option></select></label>
-          <label>Route<select id="route-filter"><option value="all">All routes</option></select></label>
-          <label>Institution type<select id="type-filter"><option value="all">All institution types</option></select></label>
-          <label>Seat type<select id="seat-filter"><option value="all">All seat types</option></select></label>
+          <div id="college-filter"></div>
+          <div id="branch-filter"></div>
+          <div id="route-filter"></div>
+          <div id="type-filter"></div>
+          <div id="seat-filter"></div>
           <label>Minimum seats<input id="min-seats" type="number" min="0" inputmode="numeric" placeholder="Any"></label>
           <label>Maximum seats<input id="max-seats" type="number" min="0" inputmode="numeric" placeholder="Any"></label>
           <label class="check-filter"><input id="show-zero" type="checkbox"> Show zero-seat rows</label>

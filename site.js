@@ -3,8 +3,7 @@
   if (!kind) return;
 
   const byId = id => document.getElementById(id);
-  const yearEl = byId('year-filter');
-  const roundEl = byId('round-filter');
+  const {MultiFilter} = window.RajasthanFilters;
   const searchEl = byId('search-filter');
   const countEl = byId('result-count');
   const hintEl = byId('table-hint');
@@ -13,46 +12,67 @@
   const sourceEl = byId('source-list');
   const dialog = byId('pdf-dialog');
   const frame = byId('pdf-frame');
-  const controls = {
-    college: byId('college-filter'), course: byId('course-filter'),
-    seat_type: byId('seat-filter'), domicile: byId('domicile-filter'),
-    considered_category: byId('category-filter'), service_status: byId('service-filter'),
+  const ranges = {
     minRank: byId('min-rank'), maxRank: byId('max-rank'),
     minAir: byId('min-air'), maxAir: byId('max-air')
   };
   const state = { documents: [], rows: [], filtered: [], rendered: 0, sortKey: '', direction: 1, token: 0 };
   const cache = new Map();
   const pageParams = new URLSearchParams(location.search);
-  const requestedRound = pageParams.get('round');
-  if (['2024', '2025'].includes(pageParams.get('year'))) yearEl.value = pageParams.get('year');
+  const requestedRounds = (pageParams.get('round') || '').split(',').filter(Boolean);
+  const requestedYears = (pageParams.get('year') || '2025').split(',').filter(year => ['2024','2025'].includes(year));
+  const yearFilter = new MultiFilter('year-filter', {label:'Exam year', allLabel:'All years', onChange:() => {
+    searchEl.value = '';
+    Object.values(ranges).forEach(control => { control.value = ''; });
+    Object.values(filters).filter(Boolean).forEach(filter => filter.clear(false));
+    loadYears();
+  }});
+  yearFilter.setOptions(['2024','2025']);
+  yearFilter.setSelected(requestedYears);
+  const roundFilter = new MultiFilter('round-filter', {label:'Round', allLabel:kind === 'merit' ? 'All rounds' : 'All recovered rounds', onChange:applyFilters});
+  const makeFilter = (id,label,allLabel,special=false) => byId(id) ? new MultiFilter(id,{label,allLabel,special,onChange:applyFilters}) : null;
+  const filters = {
+    college:makeFilter('college-filter','College','All colleges'),
+    course:makeFilter('course-filter','Course','All courses'),
+    seat_type:makeFilter('seat-filter','Allotted seat type','All seat types'),
+    domicile:makeFilter('domicile-filter','Domicile','All domiciles',true),
+    considered_category:makeFilter('category-filter','Provisional considered category','All categories'),
+    service_status:makeFilter('service-filter','Service / non-service','All service statuses')
+  };
+  const activeYears = () => yearFilter.values().length ? yearFilter.values() : ['2025','2024'];
+  const yearLabel = () => activeYears().length === 1 ? activeYears()[0] : '2024-2025';
 
   const safe = value => String(value ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
   const fmt = value => value === null || value === undefined || value === '' ? '—' : typeof value === 'number' ? value.toLocaleString('en-US') : safe(value);
   const roundKey = round => /special/i.test(round) ? 'special-stray' : /stray/i.test(round) ? 'stray' : /round\s*1/i.test(round) ? 'round-1' : /round\s*2/i.test(round) ? 'round-2' : 'round-3';
   const roundOrder = {'round-1':1,'round-2':2,'round-3':3,'stray':4,'special-stray':5};
 
-  function columns(year) {
+  function columns() {
+    const years = activeYears();
+    const has2024 = years.includes('2024'), has2025 = years.includes('2025');
     const commonMerit = [
+      ['year','Year'],
       ['round','Round'], ['registration_id','Registration ID'],
-      ...(year === 2024 ? [['list_serial','List no.']] : []),
+      ...(has2024 ? [['list_serial','List no.']] : []),
       ['state_merit_rank','State merit'],
-      ...(year === 2025 ? [['neet_pg_air','NEET-PG AIR']] : []),
+      ...(has2025 ? [['neet_pg_air','NEET-PG AIR']] : []),
       ['domicile','Domicile'], ['filled_category','Filled category'],
       ['considered_category','Provisional considered category'],
       ['service_status','Service / non-service'],
-      ...(year === 2025 ? [['neet_marks','NEET marks'],['bonus_marks','Bonus marks'],['total_marks','Total marks']] : []),
+      ...(has2025 ? [['neet_marks','NEET marks'],['bonus_marks','Bonus marks'],['total_marks','Total marks']] : []),
       ['pdf_page','Source PDF']
     ];
     const commonAllot = [
+      ['year','Year'],
       ['round','Round'], ['registration_id','Registration ID'],
-      ...(year === 2024 ? [['list_serial','List no.']] : []),
+      ...(has2024 ? [['list_serial','List no.']] : []),
       ['merit_number','Merit no.'],
-      ...(year === 2025 ? [['neet_pg_air','NEET-PG AIR']] : []),
+      ...(has2025 ? [['neet_pg_air','NEET-PG AIR']] : []),
       ['college','Allotted college'], ['course','Allotted course'],
       ['seat_type','Allotted seat type'], ['domicile','Domicile'],
       ['considered_category','Provisional considered category'],
       ['service_status','Service / non-service'],
-      ...(year === 2025 ? [['allotment_status','Allotment status']] : []),
+      ...(has2025 ? [['allotment_status','Allotment status']] : []),
       ['pdf_page','Source PDF']
     ];
     return kind === 'merit' ? commonMerit : commonAllot;
@@ -69,55 +89,50 @@
 
   function updateUrl() {
     const url = new URL(location.href);
-    url.searchParams.set('year', yearEl.value);
-    if (roundEl.value === 'all') url.searchParams.delete('round');
-    else url.searchParams.set('round', roundEl.value);
+    url.searchParams.set('year', yearFilter.values().length ? yearFilter.values().join(',') : 'all');
+    if (!roundFilter.values().length) url.searchParams.delete('round');
+    else url.searchParams.set('round', roundFilter.values().join(','));
+    for (const [key,filter] of Object.entries(filters)) {
+      url.searchParams.delete(key);
+      if (filter) filter.values().forEach(value => url.searchParams.append(key,value));
+    }
     history.replaceState(null, '', url.pathname + url.search + url.hash);
   }
 
-  function setOptions(select, values, allLabel, desired = select?.value || 'all') {
-    if (!select) return;
-    const choices = [...new Set(values.filter(Boolean))].sort((a,b) => String(a).localeCompare(String(b), undefined, {numeric:true}));
-    const hasUnreported = values.some(value => value === null || value === undefined || value === '');
-    select.innerHTML = `<option value="all">${safe(allLabel)}</option>` + choices.map(value => `<option value="${safe(value)}">${safe(value)}</option>`).join('') + (hasUnreported ? '<option value="__unreported__">Unreported</option>' : '');
-    select.value = choices.includes(desired) || (hasUnreported && desired === '__unreported__') ? desired : 'all';
-  }
-
-  function updateSelects(preferredRound = 'all') {
-    const year = Number(yearEl.value);
-    const docs = state.documents.filter(doc => doc.year === year && doc.kind === kind).sort((a,b) => a.order - b.order);
+  function updateSelects(preferredRounds = [], preferredFilters = {}) {
+    const years = activeYears().map(Number);
+    const docs = state.documents.filter(doc => years.includes(doc.year) && doc.kind === kind).sort((a,b) => a.order - b.order);
     const labels = new Map(docs.map(doc => [doc.roundKey, doc.round.replace(' — revised eligible list', '')]));
-    roundEl.innerHTML = `<option value="all">${kind === 'merit' ? 'All rounds' : 'All recovered rounds'}</option>` + docs.map(doc => `<option value="${safe(doc.roundKey)}">${safe(labels.get(doc.roundKey))}</option>`).join('');
-    roundEl.value = docs.some(doc => doc.roundKey === preferredRound) ? preferredRound : 'all';
+    roundFilter.setOptions([...labels.keys()], {labels:Object.fromEntries(labels),preserve:false,sort:false});
+    roundFilter.setSelected(preferredRounds);
     const rows = state.rows;
-    setOptions(controls.college, rows.map(row => row.college), 'All colleges');
-    setOptions(controls.course, rows.map(row => row.course), 'All courses');
-    setOptions(controls.seat_type, rows.map(row => row.seat_type), 'All seat types');
-    setOptions(controls.domicile, rows.map(row => row.domicile), 'All domiciles');
-    setOptions(controls.considered_category, rows.map(row => row.considered_category), 'All categories');
-    setOptions(controls.service_status, rows.map(row => row.service_status), 'All service statuses');
-    for (const control of [controls.minAir, controls.maxAir]) {
-      control.disabled = year === 2024;
-      if (year === 2024) control.value = '';
+    for (const [key,filter] of Object.entries(filters)) if (filter) {
+      filter.setOptions(rows.map(row => row[key]), {preserve:false});
+      filter.setSelected(preferredFilters[key] || []);
     }
-    hintEl.textContent = year === 2024
+    for (const control of [ranges.minAir, ranges.maxAir]) {
+      control.disabled = !years.includes(2025);
+      if (!years.includes(2025)) control.value = '';
+    }
+    hintEl.textContent = years.length === 2
+      ? 'Showing both exam years. The 2024 records have no published AIR; compare ranks within each year and round.'
+      : years[0] === 2024
       ? (kind === 'merit' ? '2024 has state merit only; AIR is not in these PDFs.' : '2024 Round 1 uses combined merit; later rounds use state merit after weightage. AIR is not shown.')
       : (kind === 'merit' ? '2025 shows both state merit and NEET-PG AIR.' : '2025 AIR comes from the matching round-specific merit list; Round 3 allotment coverage is incomplete.');
     updateUrl();
   }
 
   function renderSources() {
-    const year = Number(yearEl.value);
-    const docs = state.documents.filter(doc => doc.year === year && doc.kind === kind).sort((a,b) => a.order - b.order);
+    const years = activeYears().map(Number);
+    const docs = state.documents.filter(doc => years.includes(doc.year) && doc.kind === kind).sort((a,b) => b.year - a.year || a.order - b.order);
     sourceEl.innerHTML = docs.map(doc => `<article class="source-item">
-      <div><h3>${safe(doc.round)}</h3><p>${safe(doc.date)} · ${doc.pages ? fmt(doc.pages) + ' PDF pages' : 'PDF not locally verified'}${doc.entries ? ' · ' + fmt(doc.entries) + ' source rows' : ''}</p><p class="source-note">${safe(doc.note)}</p></div>
-      <div class="source-actions">${doc.path ? `<button type="button" class="button outline" data-preview="${safe(doc.path)}" data-title="${safe(year + ' · ' + doc.round)}">Preview PDF</button><a href="${safe(doc.path)}" target="_blank" rel="noopener" class="button outline">Open PDF ↗</a>` : `<a href="${safe(doc.archiveUrl)}" target="_blank" rel="noopener noreferrer" class="button outline">Archived source ↗</a>`}<details><summary>Provenance</summary><p><a href="${safe(doc.archiveUrl || doc.sourceUrl)}" target="_blank" rel="noopener noreferrer">${doc.archiveUrl ? 'Archive copy' : 'Public source copy'} ↗</a></p>${doc.sha256 ? `<p>SHA-256: <code>${safe(doc.sha256)}</code></p>` : '<p>Complete local copy not verified.</p>'}</details></div>
+      <div><h3>${doc.year} · ${safe(doc.round)}</h3><p>${safe(doc.date)} · ${doc.pages ? fmt(doc.pages) + ' PDF pages' : 'PDF not locally verified'}${doc.entries ? ' · ' + fmt(doc.entries) + ' source rows' : ''}</p><p class="source-note">${safe(doc.note)}</p></div>
+      <div class="source-actions">${doc.path ? `<button type="button" class="button outline" data-preview="${safe(doc.path)}" data-title="${safe(doc.year + ' · ' + doc.round)}">Preview PDF</button><a href="${safe(doc.path)}" target="_blank" rel="noopener" class="button outline">Open PDF ↗</a>` : `<a href="${safe(doc.archiveUrl)}" target="_blank" rel="noopener noreferrer" class="button outline">Archived source ↗</a>`}<details><summary>Provenance</summary><p><a href="${safe(doc.archiveUrl || doc.sourceUrl)}" target="_blank" rel="noopener noreferrer">${doc.archiveUrl ? 'Archive copy' : 'Public source copy'} ↗</a></p>${doc.sha256 ? `<p>SHA-256: <code>${safe(doc.sha256)}</code></p>` : '<p>Complete local copy not verified.</p>'}</details></div>
     </article>`).join('');
   }
 
   function buildHead() {
-    const year = Number(yearEl.value);
-    headEl.innerHTML = '<tr>' + columns(year).map(([key,label]) => {
+    headEl.innerHTML = '<tr>' + columns().map(([key,label]) => {
       if (key === 'pdf_page') return `<th scope="col">${safe(label)}</th>`;
       const aria = state.sortKey === key ? (state.direction === 1 ? 'ascending' : 'descending') : 'none';
       const arrow = state.sortKey === key ? (state.direction === 1 ? ' ↑' : ' ↓') : '';
@@ -128,8 +143,7 @@
   function appendRows() {
     if (state.rendered >= state.filtered.length) return;
     const more = state.filtered.slice(state.rendered, state.rendered + 120);
-    const year = Number(yearEl.value);
-    const markup = more.map(row => `<tr>${columns(year).map(([key]) => {
+    const markup = more.map(row => `<tr>${columns().map(([key]) => {
       if (key === 'pdf_page') {
         const url = sourceLink(row);
         return `<td><a href="${safe(url)}" target="_blank" rel="noopener" aria-label="Open source PDF page ${row.pdf_page}">p. ${fmt(row.pdf_page)} ↗</a></td>`;
@@ -144,15 +158,14 @@
   function applyFilters() {
     const q = searchEl.value.trim().toLocaleLowerCase();
     const rankKey = kind === 'merit' ? 'state_merit_rank' : 'merit_number';
-    const minRank = controls.minRank.value ? Number(controls.minRank.value) : null;
-    const maxRank = controls.maxRank.value ? Number(controls.maxRank.value) : null;
-    const minAir = controls.minAir.value ? Number(controls.minAir.value) : null;
-    const maxAir = controls.maxAir.value ? Number(controls.maxAir.value) : null;
-    const filters = ['college','course','seat_type','domicile','considered_category','service_status'];
+    const minRank = ranges.minRank.value ? Number(ranges.minRank.value) : null;
+    const maxRank = ranges.maxRank.value ? Number(ranges.maxRank.value) : null;
+    const minAir = ranges.minAir.value ? Number(ranges.minAir.value) : null;
+    const maxAir = ranges.maxAir.value ? Number(ranges.maxAir.value) : null;
     state.filtered = state.rows.filter(row => {
-      if (roundEl.value !== 'all' && roundKey(row.round) !== roundEl.value) return false;
+      if (!roundFilter.matches(roundKey(row.round))) return false;
       if (q && ![row.registration_id,row.college,row.course,row.domicile,row.considered_category,row.service_status,row.seat_type].filter(Boolean).some(v => String(v).toLocaleLowerCase().includes(q))) return false;
-      if (filters.some(key => controls[key] && controls[key].value !== 'all' && (controls[key].value === '__unreported__' ? Boolean(row[key]) : row[key] !== controls[key].value))) return false;
+      if (Object.entries(filters).some(([key,filter]) => filter && !filter.matches(row[key]))) return false;
       if (minRank !== null && (row[rankKey] === null || row[rankKey] < minRank)) return false;
       if (maxRank !== null && (row[rankKey] === null || row[rankKey] > maxRank)) return false;
       if (minAir !== null && (row.neet_pg_air === null || row.neet_pg_air < minAir)) return false;
@@ -170,12 +183,12 @@
         return factor * value;
       });
     } else {
-      state.filtered.sort((a,b) => roundOrder[roundKey(a.round)] - roundOrder[roundKey(b.round)] || (a[rankKey] ?? 99999999) - (b[rankKey] ?? 99999999));
+      state.filtered.sort((a,b) => b.year - a.year || roundOrder[roundKey(a.round)] - roundOrder[roundKey(b.round)] || (a[rankKey] ?? 99999999) - (b[rankKey] ?? 99999999));
     }
     state.rendered = 0;
     bodyEl.innerHTML = '';
     buildHead();
-    if (!state.filtered.length) bodyEl.innerHTML = `<tr><td colspan="${columns(Number(yearEl.value)).length}" class="empty-cell">No records match these filters. Try another round or clear a filter.</td></tr>`;
+    if (!state.filtered.length) bodyEl.innerHTML = `<tr><td colspan="${columns().length}" class="empty-cell">No records match these filters. Try another round or clear a filter.</td></tr>`;
     else appendRows();
     countEl.textContent = `${state.filtered.length.toLocaleString()} of ${state.rows.length.toLocaleString()} records`;
     byId('download-csv').disabled = !state.filtered.length;
@@ -183,7 +196,7 @@
   }
 
   function exportCsv() {
-    const keys = columns(Number(yearEl.value)).map(([key]) => key).filter(key => key !== 'pdf_page').concat(['pdf_page','source_pdf_url']);
+    const keys = columns().map(([key]) => key).filter(key => key !== 'pdf_page').concat(['pdf_page','source_pdf_url']);
     const escapeCsv = value => {
       let cell = String(value ?? '');
       if (/^[=+\-@\t\r]/.test(cell)) cell = "'" + cell;
@@ -196,30 +209,32 @@
     const blob = new Blob(['\uFEFF' + lines.join('\r\n')], {type:'text/csv;charset=utf-8'});
     const link = document.createElement('a');
     link.href = URL.createObjectURL(blob);
-    link.download = `rajasthan-neet-pg-${yearEl.value}-${kind}-filtered.csv`;
+    link.download = `rajasthan-neet-pg-${yearLabel()}-${kind}-filtered.csv`;
     document.body.append(link);
     link.click();
     link.remove();
     setTimeout(() => URL.revokeObjectURL(link.href), 1000);
   }
 
-  async function loadYear(preferredRound = 'all') {
+  async function loadYears(preferredRounds = [], preferredFilters = {}) {
     const token = ++state.token;
-    const year = yearEl.value;
     countEl.textContent = 'Loading records…';
     bodyEl.innerHTML = '';
     try {
-      const key = `${year}-${kind}`;
-      if (!cache.has(key)) {
-        const response = await fetch(`data/${key}.json`);
-        if (!response.ok) throw new Error(`HTTP ${response.status} for ${key}`);
-        cache.set(key, await response.json());
-      }
+      const years = activeYears().sort((a,b) => Number(b) - Number(a));
+      await Promise.all(years.map(async year => {
+        const key = `${year}-${kind}`;
+        if (!cache.has(key)) {
+          const response = await fetch(`data/${key}.json`);
+          if (!response.ok) throw new Error(`HTTP ${response.status} for ${key}`);
+          cache.set(key, await response.json());
+        }
+      }));
       if (token !== state.token) return;
-      state.rows = cache.get(key);
+      state.rows = years.flatMap(year => cache.get(`${year}-${kind}`));
       state.sortKey = '';
       state.direction = 1;
-      updateSelects(preferredRound);
+      updateSelects(preferredRounds, preferredFilters);
       renderSources();
       applyFilters();
     } catch (error) {
@@ -231,15 +246,8 @@
 
   const observer = new IntersectionObserver(entries => { if (entries.some(entry => entry.isIntersecting)) appendRows(); }, {rootMargin:'300px'});
   observer.observe(byId('scroll-sentinel'));
-  yearEl.addEventListener('change', () => {
-    searchEl.value = '';
-    for (const el of [controls.minRank, controls.maxRank, controls.minAir, controls.maxAir]) el.value = '';
-    for (const key of ['college','course','seat_type','domicile','considered_category','service_status']) if (controls[key]) controls[key].value = 'all';
-    loadYear();
-  });
-  roundEl.addEventListener('change', applyFilters);
   searchEl.addEventListener('input', applyFilters);
-  for (const control of Object.values(controls)) if (control) control.addEventListener('input', applyFilters);
+  for (const control of Object.values(ranges)) control.addEventListener('input', applyFilters);
   headEl.addEventListener('click', event => {
     const button = event.target.closest('[data-sort]');
     if (!button) return;
@@ -248,8 +256,9 @@
     applyFilters();
   });
   byId('reset-filters').addEventListener('click', () => {
-    roundEl.value = 'all'; searchEl.value = '';
-    for (const control of Object.values(controls)) if (control) control.value = control.tagName === 'SELECT' ? 'all' : '';
+    roundFilter.clear(false); searchEl.value = '';
+    Object.values(filters).filter(Boolean).forEach(filter => filter.clear(false));
+    Object.values(ranges).forEach(control => { control.value = ''; });
     applyFilters();
   });
   byId('download-csv').addEventListener('click', exportCsv);
@@ -268,7 +277,8 @@
     const response = await fetch('data/documents.json');
     if (!response.ok) throw new Error(`HTTP ${response.status}`);
     state.documents = (await response.json()).documents;
-    await loadYear(requestedRound || 'all');
+    const savedSelections = Object.fromEntries(Object.keys(filters).map(key => [key,pageParams.getAll(key)]));
+    await loadYears(requestedRounds,savedSelections);
   } catch (error) {
     countEl.textContent = 'Source register unavailable';
     console.error('Unable to load source register', error);

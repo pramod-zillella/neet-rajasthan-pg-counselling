@@ -5,7 +5,7 @@
   <meta name="theme-color" content="#102c3a">
   <meta name="description" content="Filter and export Rajasthan NEET-PG 2024 and 2025 allotments by college, course, seat type, domicile, category, service and rank or AIR.">
   <title>Filterable allotments · Rajasthan NEET-PG archive</title>
-  <link rel="stylesheet" href="styles.css"><script defer src="site.js"></script>
+  <link rel="stylesheet" href="styles.css"><script defer src="filter-controls.js"></script><script defer src="site.js"></script>
 </head>
 <body data-page="allotment">
   <a class="skip" href="#main">Skip to content</a>
@@ -17,18 +17,19 @@
     <section class="browser" aria-labelledby="browse-title">
       <div class="browser-head"><div><p class="eyebrow dark">Explore allotments</p><h2 id="browse-title">Allotment records</h2></div><p id="result-count" role="status" aria-live="polite">Loading records…</p></div>
       <div class="filters primary-filters">
-        <label>Exam year<select id="year-filter"><option value="2025">2025 · session 2025–26</option><option value="2024">2024 · session 2024–25</option></select></label>
-        <label>Round<select id="round-filter"><option value="all">All recovered rounds</option></select></label>
+        <div id="year-filter"></div>
+        <div id="round-filter"></div>
         <label>Search college, course or ID<input id="search-filter" type="search" placeholder="For example, MGMC, ENT or PM0218" autocomplete="off"></label>
       </div>
+      <p class="filter-help">Select several choices within a filter. “All Except Rajasthan” includes 2024 OTHER and all named non-Rajasthan domiciles in 2025.</p>
       <details class="advanced-filters" open><summary>More filters <span>college, course, seat type, domicile and rank</span></summary>
         <div class="filters extra-filters">
-          <label>College<select id="college-filter"><option value="all">All colleges</option></select></label>
-          <label>Course<select id="course-filter"><option value="all">All courses</option></select></label>
-          <label>Allotted seat type<select id="seat-filter"><option value="all">All seat types</option></select></label>
-          <label>Domicile<select id="domicile-filter"><option value="all">All domiciles</option></select></label>
-          <label>Provisional considered category<select id="category-filter"><option value="all">All categories</option></select></label>
-          <label>Service / non-service<select id="service-filter"><option value="all">All service statuses</option></select></label>
+          <div id="college-filter"></div>
+          <div id="course-filter"></div>
+          <div id="seat-filter"></div>
+          <div id="domicile-filter"></div>
+          <div id="category-filter"></div>
+          <div id="service-filter"></div>
           <label>Merit number from<input id="min-rank" type="number" min="1" inputmode="numeric" placeholder="Minimum"></label>
           <label>Merit number to<input id="max-rank" type="number" min="1" inputmode="numeric" placeholder="Maximum"></label>
           <label>NEET-PG AIR from<input id="min-air" type="number" min="1" inputmode="numeric" placeholder="2025 only"></label>

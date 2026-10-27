@@ -1,8 +1,10 @@
 # Rajasthan NEET-PG merit lists and allotments
 
-A standalone, static GitHub Pages archive for **NEET-PG 2024 / academic session 2024–25** and **NEET-PG 2025 / academic session 2025–26**. The [seat-matrix](matrix.html), [merit-list](merit.html) and [allotment](allotments.html) pages have **filterable, sortable tables** with continuous scrolling and filtered-CSV export. Download the [matrix Excel workbook](data/Rajasthan-NEET-PG-2024-2025-seat-matrices.xlsx) or the [merit/allotment Excel workbook](data/Rajasthan-NEET-PG-2024-2025-filterable.xlsx). Each row links to its source PDF page.
+A standalone, static GitHub Pages archive for **NEET-PG 2024 / academic session 2024–25** and **NEET-PG 2025 / academic session 2025–26**. The [seat-matrix](matrix.html), [merit-list](merit.html) and [allotment](allotments.html) pages have **filterable, sortable tables** with continuous scrolling and filtered-CSV export. Categorical filters accept multiple checkbox selections, including both exam years and multiple rounds. Within a filter, selected options are combined; different filters narrow the results. The merit and allotment domicile menus include **All Except Rajasthan** (2024 OTHER and named non-Rajasthan 2025 domiciles). Download the [matrix Excel workbook](data/Rajasthan-NEET-PG-2024-2025-seat-matrices.xlsx) or the [merit/allotment Excel workbook](data/Rajasthan-NEET-PG-2024-2025-filterable.xlsx). Each row links to its source PDF page.
 
 The site needs no account, API key or server-side database. Open the [home page](index.html) on GitHub Pages. For local preview, run `python -m http.server 8000` in this directory and visit `http://localhost:8000/`. Browsers generally block `fetch()` from `file://`, so double-clicking an HTML file will not load the document register.
+
+Selecting categorical options updates the page URL, so you can copy a link to the same year, rounds and selected filters. The search box and numeric ranges apply to the current view and are not saved in that link. A blank checkbox selection means all values; use **Clear** inside a menu to return to all values.
 
 ## What is included
 
