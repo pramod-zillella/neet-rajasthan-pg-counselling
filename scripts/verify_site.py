@@ -107,6 +107,27 @@ def main() -> None:
     merit26_doc = next(doc for doc in docs if doc["year"] == 2026 and doc["kind"] == "merit")
     assert merit26_doc["sha256"] == MERIT_2026_SHA256 and merit26_doc["entries"] == 3160
 
+    # The public rank-comparison page compares the same Round 1 state-merit
+    # position in two different exam-year cohorts. Keep the example auditable.
+    round1_2025 = [row for row in rows_by_key[(2025, "merit")] if row["round"] == "Round 1"]
+    assert len(round1_2025) == 3706
+    assert [row["state_merit_rank"] for row in round1_2025] == list(range(1, 3707))
+    assert all(row["service_status"] in {"In-Service", "Non-Service"} for row in round1_2025 + merit26)
+    assert next(row for row in round1_2025 if row["state_merit_rank"] == 2085)["neet_pg_air"] == 84473
+    assert merit26[2084]["neet_pg_air"] == 61347
+    assert merit26[2084]["domicile"] == "Telangana" and merit26[2084]["service_status"] == "Non-Service"
+    def ahead_mix(rows):
+        ahead = [row for row in rows if row["state_merit_rank"] < 2085]
+        return (
+            sum(row["domicile"] == "Rajasthan" and row["service_status"] == "In-Service" for row in ahead),
+            sum(row["domicile"] == "Rajasthan" and row["service_status"] == "Non-Service" for row in ahead),
+            sum(row["domicile"] not in {"Rajasthan", "Not Applicable"} and row["service_status"] == "In-Service" for row in ahead),
+            sum(row["domicile"] not in {"Rajasthan", "Not Applicable"} and row["service_status"] == "Non-Service" for row in ahead),
+            sum(row["domicile"] == "Not Applicable" for row in ahead),
+        )
+    assert ahead_mix(round1_2025) == (1181, 742, 5, 156, 0)
+    assert ahead_mix(merit26) == (800, 1225, 1, 57, 1)
+
     for year in (2024, 2025):
         merit = {(r["round"], r["registration_id"]): r for r in rows_by_key[(year,"merit")]}
         for allot in rows_by_key[(year,"allotment")]:

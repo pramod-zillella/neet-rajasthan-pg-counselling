@@ -16,6 +16,10 @@ Selecting categorical options updates the page URL, so you can copy a link to th
 
 The 2024 merit lists do **not** explicitly contain NEET-PG All India Rank. The 2025 merit lists and 2026 Round 1 list contain both state merit rank and AIR. The 2026 list is provisional and does not establish final eligibility or admission. An allotment is not a final joining record; candidates can recur across rounds, and an allotment-row count is not a count of distinct candidates. The recovered 2025 Round 3 allotment PDF has 74 physical pages although its page footers say “of 125”; its completeness is not certified. Do not infer a final closing cutoff from it. The older Board portals were unavailable during research, and later corrigenda have not been ruled out.
 
+## Round 1 rank comparison
+
+The [2025–2026 rank-comparison page](rank-comparison.html) compares the same **Round 1 state-merit position** across two separate candidate cohorts. Enter a rank to see the AIR and domicile/service status printed at that position, plus counts of candidates ahead in five domicile/service groups. Rank 2,085 is the starting example; the link retains any rank you choose. The 2025 Round 1 list has 3,706 entries and the provisional 2026 list has 3,160, so ranks above 3,160 have no 2026 comparison. This is a comparison of list composition, not a cross-year performance measure or college cutoff. Rajasthan-domicile candidates may also compete for Rajasthan Board private-college All India/open seats, so domicile counts alone cannot measure competition for a particular seat.
+
 ## Seat matrices
 
 The matrix table contains **10,920 cells from 2024** and **6,144 cells from 2025**, including cells with zero seats. By default the website shows positive-seat rows for one selected round. The 2024 collection uses Board-issued medical and DNB/Diploma PDFs for Round 1, Round 2, Round 3, Stray and Special Stray. The 2025 source set covers medical-college MD/MS seats for Round 1, Round 2, Round 3 and Stray; **2025 DNB/Diploma seats are not in these verified matrices**. A missing route in 2025 must not be interpreted as zero seats.

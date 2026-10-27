@@ -1,0 +1,39 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#102c3a">
+  <meta name="description" content="Compare Rajasthan NEET-PG 2025 and provisional 2026 Round 1 state merit positions, AIR and the domicile/service mix ahead of a chosen rank.">
+  <title>Rank comparison · Rajasthan NEET-PG archive</title>
+  <link rel="stylesheet" href="styles.css?v=20261027-rank"><script defer src="rank-comparison.js?v=20261027-rank"></script>
+</head>
+<body>
+  <a class="skip" href="#main">Skip to content</a>
+  <header class="site-header"><div class="wrap header-inner"><a class="brand" href="index.html" aria-label="Rajasthan NEET-PG archive home"><span class="brand-mark">RJ</span><span>Rajasthan <small>NEET-PG archive</small></span></a><nav aria-label="Main navigation"><a href="index.html">Overview</a><a href="merit.html">Merit lists</a><a class="active" aria-current="page" href="rank-comparison.html">Rank comparison</a><a href="allotments.html">Allotments</a><a href="matrix.html">Seat matrices</a><a href="growth.html">Seat growth</a></nav></div></header>
+  <main id="main" class="wrap collection">
+    <div class="breadcrumb"><a href="index.html">Overview</a><span aria-hidden="true">/</span><span>Rank comparison</span></div>
+    <div class="collection-heading"><div><p class="eyebrow dark">Round 1 / 2025 vs 2026</p><h1>Who is ahead at this state rank?</h1><p>Choose a state-merit position to compare the candidates listed above it in Rajasthan's 2025 and provisional 2026 Round 1 merit lists.</p></div><div class="heading-symbol" aria-hidden="true">05</div></div>
+
+    <div class="insight"><span class="insight-icon" aria-hidden="true">i</span><p><strong>Same position, different cohorts.</strong> Each year's rank and AIR describe a different candidate in a different NEET-PG exam. This is a composition comparison, not a predicted cutoff, an admission probability, or a measure of how your exam performance changed.</p></div>
+
+    <section class="rank-control" aria-labelledby="rank-control-title">
+      <div><p class="eyebrow dark">Explore a position</p><h2 id="rank-control-title">State merit rank</h2><p>Enter a rank from 1 to 3,706. Rank 2,085 is the starting example. The 2026 list ends at 3,160.</p></div>
+      <form id="rank-form" class="rank-form"><label for="rank-input">Rank to compare</label><div><input id="rank-input" type="number" min="1" max="3706" step="1" value="2085" inputmode="numeric" required><button class="button primary" type="submit">Compare</button></div><p id="rank-error" class="rank-error" role="alert" hidden></p></form>
+    </section>
+
+    <p id="rank-status" class="rank-status" role="status" aria-live="polite">Loading Round 1 merit lists…</p>
+    <section id="rank-results" hidden aria-label="Rank comparison results">
+      <div class="section-heading rank-section-heading"><div><p class="eyebrow dark">At the chosen position</p><h2 id="position-title">Rank 2,085 in each list</h2></div><p>These two rows belong to different candidates. Open the Board PDF to check the printed entry.</p></div>
+      <div id="position-cards" class="position-cards"></div>
+
+      <div class="section-heading rank-section-heading"><div><p class="eyebrow dark">Ahead of this rank</p><h2 id="ahead-title">Candidates before rank 2,085</h2></div><p>Each count covers state-merit ranks strictly lower than the rank selected above.</p></div>
+      <div id="rank-bars" class="rank-bars" aria-label="Composition of candidates ahead by year"></div>
+      <div class="rank-legend" aria-label="Chart categories"><span><i class="rank-swatch raj-service"></i>Rajasthan · In-Service</span><span><i class="rank-swatch raj-nonservice"></i>Rajasthan · Non-Service</span><span><i class="rank-swatch other-service"></i>Other domicile · In-Service</span><span><i class="rank-swatch other-nonservice"></i>Other domicile · Non-Service</span><span><i class="rank-swatch unknown-domicile"></i>Domicile not applicable</span></div>
+      <div class="table-scroll rank-table"><table><caption>Count of candidates ahead of the selected state merit rank</caption><thead><tr><th scope="col">Domicile and service status</th><th scope="col">2025</th><th scope="col">2026 provisional</th><th scope="col">Change in count</th></tr></thead><tbody id="rank-breakdown"></tbody></table></div>
+      <p id="rank-reading" class="rank-reading"></p>
+    </section>
+
+    <section class="footnote-panel rank-method"><h2>Method and limits</h2><p>The 2025 comparison uses only the <a href="documents/2025/merit/round-1.pdf">revised provisional Round 1 merit list dated 23 November 2025</a> (3,706 entries). The 2026 comparison uses only the <a href="documents/2026/merit/round-1.pdf">provisional Round 1 list dated 27 October 2026</a> (3,160 entries). Counts are calculated directly from the site's <a href="data/2025-merit.json">2025 merit data</a> and <a href="data/2026-merit.json">2026 merit data</a>. Later rounds or revisions can change the list, ranks and eligible pool.</p><p>“Other domicile” means a named domicile other than Rajasthan. The Board's “Not Applicable” label is separate and is never counted as out-of-state. “Ahead” refers only to order in the published state merit list. In-service bonus marks affect that order. Domicile and service labels alone do not prove which specific seats a candidate can choose. Rajasthan-domicile applicants may also compete for Rajasthan private-college All India/open seats; these are <strong>Rajasthan Board seats, not MCC AIQ seats</strong>. Use the <a href="matrix.html">seat matrix</a>, applicable Board rules and actual <a href="allotments.html">allotments</a> to assess a college or branch.</p></section>
+  </main>
+  <footer class="site-footer"><div class="wrap"><p>Independent research archive · Confirm current Board notices before a counselling decision.</p><p><a href="index.html">Overview</a><a href="merit.html">Merit lists</a><a href="data/documents.json">Source register</a></p></div></footer>
+</body></html>

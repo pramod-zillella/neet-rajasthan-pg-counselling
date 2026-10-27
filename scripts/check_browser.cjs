@@ -110,7 +110,40 @@ let browser, ws;
   await evaluate(`(()=>{const x=document.getElementById('branch-filter-search');x.focus();x.value='radiotherapy';x.dispatchEvent(new Event('input',{bubbles:true}));})()`);
   assert.ok(await evaluate(`document.querySelectorAll('#branch-filter .picker-options input').length > 0`));
 
+  await send('Page.navigate', {url:base + '/rank-comparison.html'});
+  await waitFor(`document.getElementById('rank-results')?.hidden === false`);
+  if (process.env.UI_SNAPSHOT_DIR) {
+    fs.mkdirSync(process.env.UI_SNAPSHOT_DIR, {recursive:true});
+    const shot = await send('Page.captureScreenshot', {format:'png',captureBeyondViewport:false});
+    fs.writeFileSync(path.join(process.env.UI_SNAPSHOT_DIR, 'rank-comparison-desktop.png'), Buffer.from(shot.data,'base64'));
+  }
+  assert.equal(await evaluate(`document.querySelectorAll('.position-card').length`), 2);
+  assert.ok((await evaluate(`document.getElementById('position-cards').textContent`)).includes('61,347'));
+  assert.ok((await evaluate(`document.getElementById('position-cards').textContent`)).includes('84,473'));
+  assert.deepEqual(await evaluate(`Array.from(document.querySelectorAll('#rank-breakdown tr')).map(row=>Array.from(row.cells).map(cell=>cell.textContent.trim()))`), [
+    ['Rajasthan · In-Service','1,181','800','-381'],
+    ['Rajasthan · Non-Service','742','1,225','+483'],
+    ['Other domicile · In-Service','5','1','-4'],
+    ['Other domicile · Non-Service','156','57','-99'],
+    ['Domicile not applicable','0','1','+1'],
+    ['Total ahead','2,084','2,084','0']
+  ]);
+  await evaluate(`(()=>{const input=document.getElementById('rank-input');input.value='3300';document.getElementById('rank-form').requestSubmit();})()`);
+  await waitFor(`document.getElementById('position-title').textContent.includes('3,300')`);
+  assert.ok((await evaluate(`document.querySelector('.position-card.unavailable')?.textContent`)).includes('not listed'));
+  assert.ok((await evaluate(`location.search`)).includes('rank=3300'));
+  await send('Page.navigate', {url:base + '/rank-comparison.html?rank=1'});
+  await waitFor(`document.getElementById('position-title')?.textContent.includes('Rank 1')`);
+  assert.ok((await evaluate(`document.querySelector('#rank-breakdown .rank-total')?.textContent`)).includes('0'));
+
   await send('Emulation.setDeviceMetricsOverride', {width:390,height:844,deviceScaleFactor:1,mobile:true});
+  await send('Page.navigate', {url:base + '/rank-comparison.html'});
+  await waitFor(`document.getElementById('rank-results')?.hidden === false`);
+  assert.equal(await evaluate(`document.documentElement.scrollWidth <= window.innerWidth`), true);
+  if (process.env.UI_SNAPSHOT_DIR) {
+    const shot = await send('Page.captureScreenshot', {format:'png',captureBeyondViewport:false});
+    fs.writeFileSync(path.join(process.env.UI_SNAPSHOT_DIR, 'rank-comparison-mobile.png'), Buffer.from(shot.data,'base64'));
+  }
   await send('Page.navigate', {url:base + '/merit.html?year=2026'});
   await waitFor(`document.getElementById('result-count')?.textContent.includes('3,160 of 3,160')`);
   await evaluate(`(()=>{const x=document.getElementById('domicile-filter-search');x.scrollIntoView({block:'center'});x.focus();x.value='tel';x.dispatchEvent(new Event('input',{bubbles:true}));})()`);
@@ -122,7 +155,7 @@ let browser, ws;
     fs.writeFileSync(path.join(process.env.UI_SNAPSHOT_DIR, 'merit-mobile.png'), Buffer.from(shot.data,'base64'));
   }
   assert.equal(errors.length, 0, JSON.stringify(errors));
-  console.log('Browser checks passed: live typeahead, selection chips, domicile shortcut, shared URL, all four data views and mobile popup.');
+  console.log('Browser checks passed: live typeahead, selection chips, domicile shortcut, shared URL, rank comparison, data views and mobile popup.');
   await send('Browser.close').catch(() => {});
 })().catch(error => { console.error(error); process.exitCode = 1; }).finally(async () => {
   if (ws) ws.close();
