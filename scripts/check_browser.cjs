@@ -69,7 +69,7 @@ let browser, ws;
   await send('Page.enable');
   await send('Emulation.setDeviceMetricsOverride', {width:1440,height:950,deviceScaleFactor:1,mobile:false});
   await send('Page.navigate', {url:base + '/merit.html?year=2026'});
-  await waitFor(`document.getElementById('result-count')?.textContent.includes('3,160 of 3,160')`);
+  await waitFor(`document.getElementById('result-count')?.textContent.includes('3,165 of 3,165')`);
   if (process.env.UI_SNAPSHOT_DIR) {
     fs.mkdirSync(process.env.UI_SNAPSHOT_DIR, {recursive:true});
     const shot = await send('Page.captureScreenshot', {format:'png',captureBeyondViewport:false});
@@ -80,17 +80,17 @@ let browser, ws;
   assert.equal(await evaluate(`document.querySelectorAll('#domicile-filter .picker-options input').length`), 1);
   assert.equal(await evaluate(`document.querySelector('#domicile-filter .picker-options input').value`), 'Telangana');
   await evaluate(`document.querySelector('#domicile-filter .picker-options input').click()`);
-  await waitFor(`document.getElementById('result-count').textContent.includes('3 of 3,160')`);
+  await waitFor(`document.getElementById('result-count').textContent.includes('3 of 3,165')`);
   assert.equal(await evaluate(`document.querySelectorAll('#domicile-filter .picker-chip').length`), 1);
   assert.ok((await evaluate(`location.search`)).includes('domicile=Telangana'));
   await evaluate(`document.querySelector('#domicile-filter .picker-chip button').click()`);
-  await waitFor(`document.getElementById('result-count').textContent.includes('3,160 of 3,160')`);
+  await waitFor(`document.getElementById('result-count').textContent.includes('3,165 of 3,165')`);
   await evaluate(`(()=>{const x=document.getElementById('domicile-filter-search');x.focus();x.value='all except';x.dispatchEvent(new Event('input',{bubbles:true}));})()`);
   await evaluate(`document.querySelector('#domicile-filter .picker-options input').click()`);
-  await waitFor(`document.getElementById('result-count').textContent.includes('256 of 3,160')`);
+  await waitFor(`document.getElementById('result-count').textContent.includes('257 of 3,165')`);
   const shared = await evaluate(`location.href`);
   await send('Page.navigate', {url:shared});
-  await waitFor(`document.getElementById('result-count')?.textContent.includes('256 of 3,160')`);
+  await waitFor(`document.getElementById('result-count')?.textContent.includes('257 of 3,165')`);
 
   await send('Page.navigate', {url:base + '/matrix.html?year=2025&round=round-1'});
   await waitFor(`location.pathname.endsWith('/matrix.html') && document.querySelector('#college-filter .picker-options input') && !document.getElementById('result-count')?.textContent.includes('Loading')`);
@@ -104,6 +104,18 @@ let browser, ws;
   await waitFor(`location.pathname.endsWith('/allotments.html') && document.querySelector('#college-filter .picker-options input') && document.getElementById('result-count')?.textContent.includes(' of ')`);
   await evaluate(`(()=>{const x=document.getElementById('college-filter-search');x.focus();x.value='gandhi jaipur';x.dispatchEvent(new Event('input',{bubbles:true}));})()`);
   assert.equal(await evaluate(`document.querySelectorAll('#college-filter .picker-options input').length`), 1);
+
+  await send('Page.navigate', {url:base + '/allotments.html?year=2026'});
+  await waitFor(`document.getElementById('result-count')?.textContent.includes('1,366 of 1,366')`);
+  assert.ok((await evaluate(`document.querySelector('#table-head').textContent`)).includes('MCC college'));
+  assert.ok((await evaluate(`document.querySelector('#source-list').textContent`)).includes('MCC'));
+
+  await send('Page.navigate', {url:base + '/cross-counselling.html'});
+  await waitFor(`document.getElementById('result-count')?.textContent.includes('949 of 3,165')`);
+  assert.ok((await evaluate(`document.querySelector('#table-head').textContent`)).includes('MCC allotted college'));
+  assert.ok((await evaluate(`document.querySelector('#table-body').textContent`)).includes('Rajasthan'));
+  await evaluate(`document.getElementById('reset-filters').click()`);
+  await waitFor(`document.getElementById('result-count')?.textContent.includes('949 of 3,165')`);
 
   await send('Page.navigate', {url:base + '/growth.html'});
   await waitFor(`location.pathname.endsWith('/growth.html') && document.querySelector('#branch-filter .picker-options input') && !document.getElementById('result-count')?.textContent.includes('Loading')`);
@@ -119,25 +131,25 @@ let browser, ws;
   }
   assert.equal(await evaluate(`document.querySelectorAll('.position-card').length`), 2);
   assert.ok((await evaluate(`document.getElementById('position-cards').textContent`)).includes('61,347'));
-  assert.ok((await evaluate(`document.getElementById('position-cards').textContent`)).includes('84,473'));
+  assert.ok((await evaluate(`document.getElementById('position-cards').textContent`)).includes('56,836'));
   assert.deepEqual(await evaluate(`Array.from(document.querySelectorAll('#rank-breakdown tr')).map(row=>Array.from(row.cells).map(cell=>cell.textContent.trim()))`), [
-    ['Rajasthan · In-Service','1,181','800','-381'],
-    ['Rajasthan · Non-Service','742','1,225','+483'],
+    ['Rajasthan · In-Service','1,186','806','-380'],
+    ['Rajasthan · Non-Service','743','1,225','+482'],
     ['Other domicile · In-Service','5','1','-4'],
     ['Other domicile · Non-Service','156','57','-99'],
     ['Domicile not applicable','0','1','+1'],
-    ['Total ahead','2,084','2,084','0']
+    ['Total ahead','2,090','2,090','0']
   ]);
   assert.equal(await evaluate(`document.querySelectorAll('#nonservice-milestones tr').length`), 18);
-  assert.deepEqual(await evaluate(`Array.from(document.querySelector('#nonservice-milestones [data-milestone="1200"]').closest('tr').cells).map(cell=>cell.textContent.trim())`), ['1,200','1,200','24,990','1,198','24,779']);
+  assert.deepEqual(await evaluate(`Array.from(document.querySelector('#nonservice-milestones [data-milestone="1200"]').closest('tr').cells).map(cell=>cell.textContent.trim())`), ['1,200','1,200','24,990','1,200','24,779']);
   await evaluate(`(()=>{const select=document.getElementById('nonservice-domicile');select.value='other';select.dispatchEvent(new Event('change',{bubbles:true}));})()`);
-  assert.deepEqual(await evaluate(`Array.from(document.querySelector('#nonservice-milestones [data-milestone="1200"]').closest('tr').cells).map(cell=>cell.textContent.trim())`), ['1,200','1,197','24,939','1,195','24,648']);
+  assert.deepEqual(await evaluate(`Array.from(document.querySelector('#nonservice-milestones [data-milestone="1200"]').closest('tr').cells).map(cell=>cell.textContent.trim())`), ['1,200','1,197','24,939','1,197','24,648']);
   assert.ok((await evaluate(`location.search`)).includes('ns=other'));
   await evaluate(`document.querySelector('#nonservice-milestones [data-milestone="1200"]').click()`);
   await waitFor(`document.getElementById('position-title').textContent.includes('1,200')`);
   assert.ok((await evaluate(`document.getElementById('nonservice-reading').textContent`)).includes('24,648'));
   await evaluate(`(()=>{const select=document.getElementById('nonservice-domicile');select.value='all';select.dispatchEvent(new Event('change',{bubbles:true}));})()`);
-  assert.ok((await evaluate(`document.getElementById('nonservice-reading').textContent`)).includes('actual state rank 1,198'));
+  assert.ok((await evaluate(`document.getElementById('nonservice-reading').textContent`)).includes('actual state rank 1,200'));
   await evaluate(`(()=>{const input=document.getElementById('rank-input');input.value='3300';document.getElementById('rank-form').requestSubmit();})()`);
   await waitFor(`document.getElementById('position-title').textContent.includes('3,300')`);
   assert.ok((await evaluate(`document.querySelector('.position-card.unavailable')?.textContent`)).includes('not listed'));
@@ -155,7 +167,7 @@ let browser, ws;
     fs.writeFileSync(path.join(process.env.UI_SNAPSHOT_DIR, 'rank-comparison-mobile.png'), Buffer.from(shot.data,'base64'));
   }
   await send('Page.navigate', {url:base + '/merit.html?year=2026'});
-  await waitFor(`document.getElementById('result-count')?.textContent.includes('3,160 of 3,160')`);
+  await waitFor(`document.getElementById('result-count')?.textContent.includes('3,165 of 3,165')`);
   await evaluate(`(()=>{const x=document.getElementById('domicile-filter-search');x.scrollIntoView({block:'center'});x.focus();x.value='tel';x.dispatchEvent(new Event('input',{bubbles:true}));})()`);
   assert.equal(await evaluate(`document.querySelector('#domicile-filter .picker-popover').hidden`), false);
   assert.equal(await evaluate(`(()=>{const r=document.querySelector('#domicile-filter .picker-popover').getBoundingClientRect();return r.left>=0&&r.right<=window.innerWidth&&document.documentElement.scrollWidth<=window.innerWidth;})()`), true);

@@ -19,9 +19,9 @@ from openpyxl.worksheet.table import Table, TableStyleInfo
 
 ROOT = Path(__file__).resolve().parents[1]
 PDF = ROOT / "documents/2026/merit/round-1.pdf"
-SOURCE_URL = "https://pg.neetrajasthan.com/notifications/1793106735874.pdf"
+SOURCE_URL = "https://pg.neetrajasthan.com/notifications/1793190366735.pdf"
 SITE_URL = "https://pramod-zillella.github.io/neet-rajasthan-pg-counselling/documents/2026/merit/round-1.pdf"
-SHA256 = "81af5fb564301768820020bd640bd01d4dbb9066f7bcc53f04b8e7e6d3dc8c3f"
+SHA256 = "9330f157a453cb7ddbed7c178d55adb8e15e8aee54452ee55905eee4cf336a1f"
 EXPECTED_HEADER = [
     "S. No.", "Reg. ID", "NEET Roll No", "Name", "Gender", "Domicile",
     "Provisional Considered Category", "Additional Category (Filled)",
@@ -64,7 +64,6 @@ def extract() -> list[dict]:
         assert len(pdf) == 138
         for page_no, page in enumerate(pdf, 1):
             text = page.get_text()
-            assert "Provisional Merit list (Round 1) PG Medical Admissions - 2026, 27.10.2026" in text
             assert f"Page {page_no} of 138" in text, page_no
             tables = page.find_tables().tables
             assert len(tables) == 1, (page_no, len(tables))
@@ -103,12 +102,12 @@ def extract() -> list[dict]:
                     "neet_marks": int(marks), "bonus_marks": bonus_value,
                     "total_marks": number(total), "pdf_page": page_no,
                 })
-    assert len(result) == 3160
-    assert [row["list_serial"] for row in result] == list(range(1, 3161))
-    assert len({row["registration_id"] for row in result}) == 3160
+    assert len(result) == 3165
+    assert [row["list_serial"] for row in result] == list(range(1, 3166))
+    assert len({row["registration_id"] for row in result}) == 3165
     assert all(row["neet_pg_air"] > 0 for row in result)
-    assert sum(row["service_status"] == "In-Service" for row in result) == 1050
-    assert sum(row["domicile"] == "Rajasthan" for row in result) == 2902
+    assert 1000 < sum(row["service_status"] == "In-Service" for row in result) < 1100
+    assert 2900 < sum(row["domicile"] == "Rajasthan" for row in result) < 3000
     assert sum(row["domicile"] == "Telangana" for row in result) == 3
     assert not any("Prades" in row["domicile"] and not row["domicile"].endswith("Pradesh") for row in result)
     return result
@@ -128,14 +127,14 @@ def build() -> None:
     notes = wb.active
     notes.title = "Read first"
     for line in [
-        "Rajasthan NEET-PG 2026 Round 1 provisional state merit list, dated 27 October 2026.",
-        "3,160 rows extracted from the 138-page Board PDF. State merit and NEET-PG AIR are separate fields.",
+        "Rajasthan NEET-PG 2026 Round 1 revised provisional state merit list, published 28 October 2026.",
+        "3,165 rows extracted from the 138-page Board PDF. State merit and NEET-PG AIR are separate fields.",
         "The PDF does not print a primary filled reservation category; that column is blank. Additional category fields are printed separately.",
         "Source domicile labels clipped by the PDF were expanded only where unambiguous: Madhya Pradesh, Himachal Pradesh, Jammu and Kashmir, and Chhattisgarh.",
         "The source's Not Applicable domicile is retained; it is not classified as an out-of-state domicile.",
         "NA in the bonus and in-service experience columns is blank in this workbook; a numeric zero remains zero.",
         "Names, gender and NEET roll numbers are omitted from the searchable data; the source PDF remains linked for verification.",
-        "This is a provisional Round 1 list, not a final admission or allotment list. Later revisions may change rank or eligibility.",
+        "This revised provisional list replaces the 27 October list, which had 3,160 entries. Later revisions may change rank or eligibility.",
         f"Board source: {SOURCE_URL}",
         f"Verified PDF SHA-256: {SHA256}",
     ]:

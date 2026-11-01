@@ -16,6 +16,8 @@ from labels import VALID_2025_COLLEGES, VALID_2025_COURSES
 from build_matrix import FULL_2025_BRANCH, TRUNCATED_2025_BRANCH
 from build_growth import extract_2026, PDF_2026_SHA256
 from build_2026_merit import SHA256 as MERIT_2026_SHA256
+from build_2026_allotment import RAJASTHAN_SHA256 as ALLOTMENT_2026_SHA256
+from mcc_2026_source import SHA256 as MCC_2026_SHA256
 
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -36,9 +38,10 @@ class Links(HTMLParser):
 def main() -> None:
     manifest = json.loads((ROOT / "data" / "documents.json").read_text(encoding="utf-8"))
     docs = manifest["documents"]
-    assert len(docs) == 19, f"Expected 19 round records, got {len(docs)}"
+    assert len(docs) == 21, f"Expected 21 source records, got {len(docs)}"
     assert sum(d["kind"] == "merit" for d in docs) == 10
-    assert sum(d["kind"] == "allotment" and bool(d["path"]) for d in docs) == 7
+    assert sum(d["kind"] == "allotment" and bool(d["path"]) for d in docs) == 8
+    assert sum(d["kind"] == "mcc" and bool(d["path"]) for d in docs) == 1
     assert sum(d["status"] == "archive-only" for d in docs) == 2
     local_pdfs = set()
     for doc in docs:
@@ -63,10 +66,10 @@ def main() -> None:
         for relative in parser.paths:
             assert (html.parent / relative).is_file(), f"Broken local link: {html.name} -> {relative}"
 
-    assert len(local_pdfs) == 18
+    assert len(local_pdfs) == 21
     expected = {(2024,"merit"):16914, (2024,"allotment"):4969,
                 (2025,"merit"):13221, (2025,"allotment"):5520,
-                (2026,"merit"):3160}
+                (2026,"merit"):3165, (2026,"allotment"):1366}
     rows_by_key = {}
     for (year, kind), count in expected.items():
         stem = f"{year}-{kind}"
@@ -79,7 +82,7 @@ def main() -> None:
             if year == 2025:
                 assert {row["college"] for row in rows} == VALID_2025_COLLEGES, "Unreviewed/missing 2025 college label"
                 assert {row["course"] for row in rows} == VALID_2025_COURSES, "Unreviewed/missing 2025 course label"
-            else:
+            elif year == 2024:
                 assert all(row["course"].startswith(("MD (", "MS (", "Post MBBS ", "Post Diploma ")) for row in rows)
         if year == 2025:
             assert all("General" not in row["domicile"] and "OBC" not in row["domicile"] for row in rows), stem
@@ -94,18 +97,42 @@ def main() -> None:
         rows_by_key[(year,kind)] = rows
 
     merit26 = rows_by_key[(2026, "merit")]
-    assert [row["list_serial"] for row in merit26] == list(range(1, 3161))
+    assert [row["list_serial"] for row in merit26] == list(range(1, 3166))
     assert all(row["state_merit_rank"] == row["list_serial"] and row["round"] == "Round 1" for row in merit26)
-    assert len({row["registration_id"] for row in merit26}) == 3160
+    assert len({row["registration_id"] for row in merit26}) == 3165
     assert all(row["filled_category"] is None for row in merit26)
     assert {row["considered_category"] for row in merit26} == {"General", "OBC NCL", "MBC NCL", "EWS", "SC", "ST"}
-    assert sum(row["domicile"] == "Rajasthan" for row in merit26) == 2902
+    assert sum(row["domicile"] == "Rajasthan" for row in merit26) == 2906
     assert sum(row["domicile"] == "Telangana" for row in merit26) == 3
     assert {row["domicile"] for row in merit26}.isdisjoint({"Madhya Prades", "Himachal Prade", "Jammu & Kashm", "Chattisgarh"})
     assert all(row["pdf_page"] <= 138 for row in merit26)
     assert all(set(row).isdisjoint({"name", "gender", "neet_roll_no", "neet_roll_number"}) for row in merit26)
     merit26_doc = next(doc for doc in docs if doc["year"] == 2026 and doc["kind"] == "merit")
-    assert merit26_doc["sha256"] == MERIT_2026_SHA256 and merit26_doc["entries"] == 3160
+    assert merit26_doc["sha256"] == MERIT_2026_SHA256 and merit26_doc["entries"] == 3165
+    allot26_doc = next(doc for doc in docs if doc["year"] == 2026 and doc["kind"] == "allotment")
+    mcc26_doc = next(doc for doc in docs if doc["year"] == 2026 and doc["kind"] == "mcc")
+    assert (allot26_doc["sha256"], allot26_doc["entries"]) == (ALLOTMENT_2026_SHA256, 1366)
+    assert (mcc26_doc["sha256"], mcc26_doc["entries"]) == (MCC_2026_SHA256, 28723)
+    allot26 = rows_by_key[(2026, "allotment")]
+    merit_by_registration = {row["registration_id"]: row for row in merit26}
+    assert len({row["registration_id"] for row in allot26}) == 1366
+    assert all((row["merit_number"], row["neet_pg_air"], row["domicile"]) ==
+               (merit_by_registration[row["registration_id"]]["state_merit_rank"],
+                merit_by_registration[row["registration_id"]]["neet_pg_air"],
+                merit_by_registration[row["registration_id"]]["domicile"]) for row in allot26)
+    assert sum(bool(row["mcc_college"]) for row in allot26) == 406
+    cross = json.loads((ROOT / "data/2026-cross-counselling.json").read_text(encoding="utf-8"))
+    assert len(cross) == 3165 and len({row["neet_pg_air"] for row in cross}) == 3165
+    assert sum(bool(row["mcc_college"]) for row in cross) == 1070
+    assert sum(row["domicile"] == "Rajasthan" and bool(row["mcc_college"]) for row in cross) == 949
+    assert sum(bool(row["state_college"]) for row in cross) == 1366
+    assert sum(bool(row["state_college"]) and bool(row["mcc_college"]) for row in cross) == 406
+    assert all(row["mcc_pdf_page"] is None or 2 <= row["mcc_pdf_page"] <= 1735 for row in cross)
+    with (ROOT / "data/2026-cross-counselling.csv").open(encoding="utf-8-sig", newline="") as stream:
+        assert sum(1 for _ in csv.DictReader(stream)) == 3165
+    cross_book = load_workbook(ROOT / "data/Rajasthan-NEET-PG-2026-Round-1-allotments-and-MCC.xlsx", read_only=True)
+    assert cross_book["Rajasthan allotments"].max_row == 1367
+    assert cross_book["Cross counselling"].max_row == 3166
 
     # The public rank-comparison page compares the same Round 1 state-merit
     # position in two different exam-year cohorts. Keep the example auditable.
@@ -113,11 +140,11 @@ def main() -> None:
     assert len(round1_2025) == 3706
     assert [row["state_merit_rank"] for row in round1_2025] == list(range(1, 3707))
     assert all(row["service_status"] in {"In-Service", "Non-Service"} for row in round1_2025 + merit26)
-    assert next(row for row in round1_2025 if row["state_merit_rank"] == 2085)["neet_pg_air"] == 84473
-    assert merit26[2084]["neet_pg_air"] == 61347
-    assert merit26[2084]["domicile"] == "Telangana" and merit26[2084]["service_status"] == "Non-Service"
+    assert next(row for row in round1_2025 if row["state_merit_rank"] == 2091)["neet_pg_air"] == 56836
+    assert merit26[2090]["neet_pg_air"] == 61347
+    assert merit26[2090]["domicile"] == "Telangana" and merit26[2090]["service_status"] == "Non-Service"
     def ahead_mix(rows):
-        ahead = [row for row in rows if row["state_merit_rank"] < 2085]
+        ahead = [row for row in rows if row["state_merit_rank"] < 2091]
         return (
             sum(row["domicile"] == "Rajasthan" and row["service_status"] == "In-Service" for row in ahead),
             sum(row["domicile"] == "Rajasthan" and row["service_status"] == "Non-Service" for row in ahead),
@@ -125,11 +152,10 @@ def main() -> None:
             sum(row["domicile"] not in {"Rajasthan", "Not Applicable"} and row["service_status"] == "Non-Service" for row in ahead),
             sum(row["domicile"] == "Not Applicable" for row in ahead),
         )
-    assert ahead_mix(round1_2025) == (1181, 742, 5, 156, 0)
-    assert ahead_mix(merit26) == (800, 1225, 1, 57, 1)
+    assert ahead_mix(round1_2025) == (1186, 743, 5, 156, 0)
+    assert ahead_mix(merit26) == (806, 1225, 1, 57, 1)
     assert (round1_2025[1199]["service_status"], round1_2025[1199]["neet_pg_air"]) == ("Non-Service", 24990)
-    assert merit26[1199]["service_status"] == "In-Service"
-    assert (merit26[1197]["state_merit_rank"], merit26[1197]["service_status"], merit26[1197]["neet_pg_air"]) == (1198, "Non-Service", 24779)
+    assert (merit26[1199]["state_merit_rank"], merit26[1199]["service_status"], merit26[1199]["neet_pg_air"]) == (1200, "Non-Service", 24779)
 
     for year in (2024, 2025):
         merit = {(r["round"], r["registration_id"]): r for r in rows_by_key[(year,"merit")]}
@@ -172,7 +198,7 @@ def main() -> None:
 
     merit26_book = load_workbook(ROOT / "data" / "Rajasthan-NEET-PG-2026-Round-1-merit.xlsx", read_only=False)
     merit26_sheet = merit26_book["2026 Round 1 Merit"]
-    assert merit26_sheet.max_row == 3161
+    assert merit26_sheet.max_row == 3166
     merit26_headers = [cell.value for cell in merit26_sheet[1]]
     assert "NEET-PG AIR" in merit26_headers and "Provisional Considered Category" in merit26_headers
     assert "Additional Category (Filled)" in merit26_headers and "Additional Category (Verified)" in merit26_headers
@@ -253,7 +279,7 @@ def main() -> None:
     assert sheet.max_row == len(growth_rows) + 1
     assert [cell.value for cell in sheet[1]][3:8] == ["2024 seats", "2025 seats", "2026 seats", "2024 to 2025", "2025 to 2026"]
     assert sheet.cell(2, 11).hyperlink.target.startswith("https://pramod-zillella.github.io/")
-    print("Verified 43,784 merit/allotment rows, 17,064 matrix cells, 384 growth rows, round/AIR joins, Excel links, 33 PDFs and site links.")
+    print("Verified 45,155 Rajasthan merit/allotment rows, 3,165 cross-counselling rows, 17,064 matrix cells, 384 growth rows, Excel links, source PDFs and site links.")
 
 
 if __name__ == "__main__":

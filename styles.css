@@ -146,3 +146,5 @@
 .picker-actions button:disabled{opacity:.4;cursor:default}
 .picker-control input:focus-visible,.picker-chip button:focus-visible,.picker-toggle:focus-visible,.picker-option input:focus-visible{outline:2px solid var(--teal);outline-offset:2px}
 @media(max-width:680px){.browser{padding:17px}.browser .primary-filters{padding:15px}.picker-popover{width:min(360px,calc(100vw - 24px))}.collection-heading h1{font-size:2.35rem}.browser-head{align-items:flex-start}}
+.site-header nav{flex-wrap:wrap;justify-content:flex-end}
+@media(max-width:800px){.site-header nav{justify-content:flex-start}}

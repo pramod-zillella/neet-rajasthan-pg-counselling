@@ -20,8 +20,8 @@
   const cache = new Map();
   const pageParams = new URLSearchParams(location.search);
   const requestedRounds = (pageParams.get('round') || '').split(',').filter(Boolean);
-  const availableYears = kind === 'merit' ? ['2024','2025','2026'] : ['2024','2025'];
-  const requestedYears = (pageParams.get('year') || (kind === 'merit' ? '2026' : '2025')).split(',').filter(year => availableYears.includes(year));
+  const availableYears = ['2024','2025','2026'];
+  const requestedYears = (pageParams.get('year') || '2026').split(',').filter(year => availableYears.includes(year));
   const yearFilter = new MultiFilter('year-filter', {label:'Exam year', allLabel:'All years', onChange:() => {
     searchEl.value = '';
     Object.values(ranges).forEach(control => { control.value = ''; });
@@ -38,6 +38,7 @@
     seat_type:makeFilter('seat-filter','Allotted seat type','All seat types'),
     domicile:makeFilter('domicile-filter','Domicile','All domiciles',true),
     considered_category:makeFilter('category-filter','Provisional considered category','All categories'),
+    mcc_match:makeFilter('mcc-filter','MCC Round 1 match','All MCC match statuses'),
     additional_category_filled:makeFilter('additional-filter','Additional category (filled)','All additional categories'),
     additional_category_verified:makeFilter('verified-filter','Additional category (verified)','All verification statuses'),
     service_status:makeFilter('service-filter','Service / non-service','All service statuses')
@@ -73,12 +74,13 @@
       ['round','Round'], ['registration_id','Registration ID'],
       ...(has2024 ? [['list_serial','List no.']] : []),
       ['merit_number','Merit no.'],
-      ...(has2025 ? [['neet_pg_air','NEET-PG AIR']] : []),
+      ...(has2025 || has2026 ? [['neet_pg_air','NEET-PG AIR']] : []),
       ['college','Allotted college'], ['course','Allotted course'],
       ['seat_type','Allotted seat type'], ['domicile','Domicile'],
       ['considered_category','Provisional considered category'],
+      ...(has2026 ? [['allotted_category','Allotted category'],['mcc_match','MCC Round 1 match'],['mcc_college','MCC college'],['mcc_course','MCC course'],['mcc_quota','MCC quota'],['mcc_pdf_page','MCC source PDF']] : []),
       ['service_status','Service / non-service'],
-      ...(has2025 ? [['allotment_status','Allotment status']] : []),
+      ...(has2025 || has2026 ? [['allotment_status','Allotment status']] : []),
       ['pdf_page','Source PDF']
     ];
     return kind === 'merit' ? commonMerit : commonAllot;
@@ -121,27 +123,27 @@
       if (control.disabled) control.value = '';
     }
     hintEl.textContent = years.length > 1
-      ? (kind === 'merit' ? 'Showing multiple exam years. Compare ranks within the same year and round; 2024 has no published AIR and 2026 Round 1 is provisional.' : 'Showing both exam years. The 2024 allotments have no published AIR; compare ranks within each year and round.')
+      ? (kind === 'merit' ? 'Showing multiple exam years. Compare ranks within the same year and round; 2024 has no published AIR and 2026 Round 1 is revised provisional.' : 'Showing multiple exam years. The 2024 allotments have no published AIR; 2026 Round 1 is indicative. Compare ranks within each year and round.')
       : years[0] === 2024
       ? (kind === 'merit' ? '2024 has state merit only; AIR is not in these PDFs.' : '2024 Round 1 uses combined merit; later rounds use state merit after weightage. AIR is not shown.')
       : years[0] === 2026
-      ? '2026 Round 1 is provisional. The Board prints both NEET-PG AIR and state merit, plus service and bonus marks.'
+      ? (kind === 'merit' ? '2026 Round 1 merit is the revised provisional list of 28 October. The Board prints AIR and state merit separately.' : '2026 Round 1 Rajasthan allotment is indicative, dated 31 October. MCC matches come from MCC’s final Round 1 result of 24 October; two allotments do not prove two joins.')
       : (kind === 'merit' ? '2025 shows both state merit and NEET-PG AIR.' : '2025 AIR comes from the matching round-specific merit list; Round 3 allotment coverage is incomplete.');
     updateUrl();
   }
 
   function renderSources() {
     const years = activeYears().map(Number);
-    const docs = state.documents.filter(doc => years.includes(doc.year) && doc.kind === kind).sort((a,b) => b.year - a.year || a.order - b.order);
+    const docs = state.documents.filter(doc => years.includes(doc.year) && (doc.kind === kind || (kind === 'allotment' && doc.kind === 'mcc'))).sort((a,b) => b.year - a.year || a.order - b.order);
     sourceEl.innerHTML = docs.map(doc => `<article class="source-item">
-      <div><h3>${doc.year} · ${safe(doc.round)}</h3><p>${safe(doc.date)} · ${doc.pages ? fmt(doc.pages) + ' PDF pages' : 'PDF not locally verified'}${doc.entries ? ' · ' + fmt(doc.entries) + ' source rows' : ''}</p><p class="source-note">${safe(doc.note)}</p></div>
+      <div><h3>${doc.year} · ${doc.kind === 'mcc' ? 'MCC ' : ''}${safe(doc.round)}</h3><p>${safe(doc.date)} · ${doc.pages ? fmt(doc.pages) + ' PDF pages' : 'PDF not locally verified'}${doc.entries ? ' · ' + fmt(doc.entries) + ' source rows' : ''}</p><p class="source-note">${safe(doc.note)}</p></div>
       <div class="source-actions">${doc.path ? `<button type="button" class="button outline" data-preview="${safe(doc.path)}" data-title="${safe(doc.year + ' · ' + doc.round)}">Preview PDF</button><a href="${safe(doc.path)}" target="_blank" rel="noopener" class="button outline">Open PDF ↗</a>` : `<a href="${safe(doc.archiveUrl)}" target="_blank" rel="noopener noreferrer" class="button outline">Archived source ↗</a>`}<details><summary>Provenance</summary><p><a href="${safe(doc.archiveUrl || doc.sourceUrl)}" target="_blank" rel="noopener noreferrer">${doc.archiveUrl ? 'Archive copy' : 'Public source copy'} ↗</a></p>${doc.sha256 ? `<p>SHA-256: <code>${safe(doc.sha256)}</code></p>` : '<p>Complete local copy not verified.</p>'}</details></div>
     </article>`).join('');
   }
 
   function buildHead() {
     headEl.innerHTML = '<tr>' + columns().map(([key,label]) => {
-      if (key === 'pdf_page') return `<th scope="col">${safe(label)}</th>`;
+      if (key === 'pdf_page' || key === 'mcc_pdf_page') return `<th scope="col">${safe(label)}</th>`;
       const aria = state.sortKey === key ? (state.direction === 1 ? 'ascending' : 'descending') : 'none';
       const arrow = state.sortKey === key ? (state.direction === 1 ? ' ↑' : ' ↓') : '';
       return `<th scope="col" aria-sort="${aria}"><button class="sort-button" type="button" data-sort="${key}">${safe(label)}${arrow}</button></th>`;
@@ -156,6 +158,9 @@
         const url = sourceLink(row);
         return `<td><a href="${safe(url)}" target="_blank" rel="noopener" aria-label="Open source PDF page ${row.pdf_page}">p. ${fmt(row.pdf_page)} ↗</a></td>`;
       }
+      if (key === 'mcc_pdf_page') return row.mcc_pdf_page
+        ? `<td><a href="documents/2026/mcc/round-1.pdf#page=${row.mcc_pdf_page}" target="_blank" rel="noopener" aria-label="Open MCC source PDF page ${row.mcc_pdf_page}">p. ${fmt(row.mcc_pdf_page)} ↗</a></td>`
+        : '<td>—</td>';
       const numeric = ['list_serial','state_merit_rank','merit_number','neet_pg_air','in_service_experience_years','neet_marks','bonus_marks','total_marks'].includes(key);
       return `<td class="${numeric ? 'numeric' : ''}${key === 'college' || key === 'course' ? ' descriptive' : ''}">${fmt(row[key])}</td>`;
     }).join('')}</tr>`).join('');
@@ -172,7 +177,7 @@
     const maxAir = ranges.maxAir.value ? Number(ranges.maxAir.value) : null;
     state.filtered = state.rows.filter(row => {
       if (!roundFilter.matches(roundKey(row.round))) return false;
-      if (q && ![row.registration_id,row.college,row.course,row.domicile,row.considered_category,row.service_status,row.seat_type].filter(Boolean).some(v => String(v).toLocaleLowerCase().includes(q))) return false;
+      if (q && ![row.registration_id,row.college,row.course,row.domicile,row.considered_category,row.service_status,row.seat_type,row.mcc_college,row.mcc_course].filter(Boolean).some(v => String(v).toLocaleLowerCase().includes(q))) return false;
       if (Object.entries(filters).some(([key,filter]) => filter && !filter.matches(row[key]))) return false;
       if (minRank !== null && (row[rankKey] === null || row[rankKey] < minRank)) return false;
       if (maxRank !== null && (row[rankKey] === null || row[rankKey] > maxRank)) return false;
@@ -204,7 +209,7 @@
   }
 
   function exportCsv() {
-    const keys = columns().map(([key]) => key).filter(key => key !== 'pdf_page').concat(['pdf_page','source_pdf_url']);
+    const keys = columns().map(([key]) => key).filter(key => key !== 'pdf_page').concat(['pdf_page','source_pdf_url','mcc_source_pdf_url']);
     const escapeCsv = value => {
       let cell = String(value ?? '');
       if (/^[=+\-@\t\r]/.test(cell)) cell = "'" + cell;
@@ -212,7 +217,7 @@
     };
     const lines = [keys.map(escapeCsv).join(',')];
     for (const row of state.filtered) {
-      lines.push(keys.map(key => escapeCsv(key === 'source_pdf_url' ? new URL(sourceLink(row), location.href).href : row[key])).join(','));
+      lines.push(keys.map(key => escapeCsv(key === 'source_pdf_url' ? new URL(sourceLink(row), location.href).href : key === 'mcc_source_pdf_url' ? (row.mcc_pdf_page ? new URL(`documents/2026/mcc/round-1.pdf#page=${row.mcc_pdf_page}`, location.href).href : '') : row[key])).join(','));
     }
     const blob = new Blob(['\uFEFF' + lines.join('\r\n')], {type:'text/csv;charset=utf-8'});
     const link = document.createElement('a');
@@ -247,8 +252,8 @@
       applyFilters();
     } catch (error) {
       countEl.textContent = 'Records unavailable';
-      const workbook = kind === 'merit' && activeYears().includes('2026') && activeYears().length === 1
-        ? 'data/Rajasthan-NEET-PG-2026-Round-1-merit.xlsx'
+      const workbook = activeYears().includes('2026') && activeYears().length === 1
+        ? (kind === 'merit' ? 'data/Rajasthan-NEET-PG-2026-Round-1-merit.xlsx' : 'data/Rajasthan-NEET-PG-2026-Round-1-allotments-and-MCC.xlsx')
         : 'data/Rajasthan-NEET-PG-2024-2025-filterable.xlsx';
       bodyEl.innerHTML = `<tr><td class="empty-cell">Could not load the table. Please refresh, or download the <a href="${workbook}">Excel workbook</a>.</td></tr>`;
       console.error('Unable to load records', error);

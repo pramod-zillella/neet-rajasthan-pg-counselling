@@ -10,7 +10,7 @@
     {key:'unknown-domicile', label:'Domicile not applicable'}
   ];
   let lists;
-  let currentRank = 2085;
+  let currentRank = 2091;
   const params = new URLSearchParams(location.search);
   const requestedRank = Number(params.get('rank'));
   if (params.has('rank') && Number.isInteger(requestedRank) && requestedRank >= 1 && requestedRank <= 3706) byId('rank-input').value = requestedRank;
@@ -91,7 +91,7 @@
     byId('rank-status').textContent = `Comparing state merit rank ${format(rank)} across the available Round 1 lists.`;
     byId('rank-results').hidden = false;
     const url = new URL(location.href);
-    if (rank === 2085) url.searchParams.delete('rank'); else url.searchParams.set('rank', rank);
+    if (rank === 2091) url.searchParams.delete('rank'); else url.searchParams.set('rank', rank);
     history.replaceState(null, '', url.pathname + url.search + url.hash);
     renderNonService();
   }
@@ -116,7 +116,7 @@
     for (const response of responses) if (!response.ok) throw new Error(`Merit data HTTP ${response.status}`);
     const all = await Promise.all(responses.map(response => response.json()));
     lists = Object.fromEntries([2025, 2026].map((year, index) => [year, all[index].filter(row => row.round === 'Round 1').sort((a, b) => a.state_merit_rank - b.state_merit_rank)]));
-    if (lists[2025].length !== 3706 || lists[2026].length !== 3160 || [2025, 2026].some(year => lists[year].some((row, index) => row.state_merit_rank !== index + 1 || !row.neet_pg_air))) throw new Error('Round 1 rank sequence or source count changed');
+    if (lists[2025].length !== 3706 || lists[2026].length !== 3165 || [2025, 2026].some(year => lists[year].some((row, index) => row.state_merit_rank !== index + 1 || !row.neet_pg_air))) throw new Error('Round 1 rank sequence or source count changed');
     render(Number(byId('rank-input').value));
   } catch (error) {
     byId('rank-status').textContent = 'Could not load the comparison. Refresh this page or open the merit lists directly.';
