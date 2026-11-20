@@ -16,6 +16,7 @@ from labels import VALID_2025_COLLEGES, VALID_2025_COURSES
 from build_matrix import FULL_2025_BRANCH, TRUNCATED_2025_BRANCH
 from build_growth import extract_2026, PDF_2026_SHA256
 from build_2026_merit import SHA256 as MERIT_2026_SHA256
+from build_2026_merit import ROUND2_SHA256
 from build_2026_allotment import RAJASTHAN_SHA256 as ALLOTMENT_2026_SHA256
 from mcc_2026_source import SHA256 as MCC_2026_SHA256
 
@@ -38,8 +39,8 @@ class Links(HTMLParser):
 def main() -> None:
     manifest = json.loads((ROOT / "data" / "documents.json").read_text(encoding="utf-8"))
     docs = manifest["documents"]
-    assert len(docs) == 21, f"Expected 21 source records, got {len(docs)}"
-    assert sum(d["kind"] == "merit" for d in docs) == 10
+    assert len(docs) == 22, f"Expected 22 source records, got {len(docs)}"
+    assert sum(d["kind"] == "merit" for d in docs) == 11
     assert sum(d["kind"] == "allotment" and bool(d["path"]) for d in docs) == 8
     assert sum(d["kind"] == "mcc" and bool(d["path"]) for d in docs) == 1
     assert sum(d["status"] == "archive-only" for d in docs) == 2
@@ -66,10 +67,10 @@ def main() -> None:
         for relative in parser.paths:
             assert (html.parent / relative).is_file(), f"Broken local link: {html.name} -> {relative}"
 
-    assert len(local_pdfs) == 21
+    assert len(local_pdfs) == 22
     expected = {(2024,"merit"):16914, (2024,"allotment"):4969,
                 (2025,"merit"):13221, (2025,"allotment"):5520,
-                (2026,"merit"):3165, (2026,"allotment"):1366}
+                (2026,"merit"):6578, (2026,"allotment"):1366}
     rows_by_key = {}
     for (year, kind), count in expected.items():
         stem = f"{year}-{kind}"
@@ -96,7 +97,15 @@ def main() -> None:
             assert index + 1 == count
         rows_by_key[(year,kind)] = rows
 
-    merit26 = rows_by_key[(2026, "merit")]
+    merit26_all = rows_by_key[(2026, "merit")]
+    merit26 = [row for row in merit26_all if row['round'] == 'Round 1']
+    merit26_round2 = [row for row in merit26_all if row['round'] == 'Round 2']
+    assert len(merit26_round2) == 3413
+    assert [row['state_merit_rank'] for row in merit26_round2] == list(range(1, 3414))
+    assert len({row['neet_pg_air'] for row in merit26_round2}) == 3413
+    assert len({row['registration_id'] for row in merit26_round2}) == 3413
+    assert all(row['pdf_page'] <= 149 for row in merit26_round2)
+    assert all(set(row).isdisjoint({'name', 'gender', 'neet_roll_no', 'neet_roll_number'}) for row in merit26_all)
     assert [row["list_serial"] for row in merit26] == list(range(1, 3166))
     assert all(row["state_merit_rank"] == row["list_serial"] and row["round"] == "Round 1" for row in merit26)
     assert len({row["registration_id"] for row in merit26}) == 3165
@@ -107,8 +116,10 @@ def main() -> None:
     assert {row["domicile"] for row in merit26}.isdisjoint({"Madhya Prades", "Himachal Prade", "Jammu & Kashm", "Chattisgarh"})
     assert all(row["pdf_page"] <= 138 for row in merit26)
     assert all(set(row).isdisjoint({"name", "gender", "neet_roll_no", "neet_roll_number"}) for row in merit26)
-    merit26_doc = next(doc for doc in docs if doc["year"] == 2026 and doc["kind"] == "merit")
+    merit26_doc = next(doc for doc in docs if doc["year"] == 2026 and doc["kind"] == "merit" and doc['roundKey'] == 'round-1')
     assert merit26_doc["sha256"] == MERIT_2026_SHA256 and merit26_doc["entries"] == 3165
+    merit26_r2_doc = next(doc for doc in docs if doc['year'] == 2026 and doc['kind'] == 'merit' and doc['roundKey'] == 'round-2')
+    assert merit26_r2_doc['sha256'] == ROUND2_SHA256 and merit26_r2_doc['entries'] == 3413
     allot26_doc = next(doc for doc in docs if doc["year"] == 2026 and doc["kind"] == "allotment")
     mcc26_doc = next(doc for doc in docs if doc["year"] == 2026 and doc["kind"] == "mcc")
     assert (allot26_doc["sha256"], allot26_doc["entries"]) == (ALLOTMENT_2026_SHA256, 1366)
@@ -207,7 +218,24 @@ def main() -> None:
     with (ROOT / "data" / "2026-merit.csv").open(encoding="utf-8-sig", newline="") as stream:
         merit26_csv = csv.DictReader(stream)
         assert not {"name", "gender", "neet_roll_no", "neet_roll_number"}.intersection(merit26_csv.fieldnames)
-        assert all(row["source_pdf_url"].endswith(f"#page={merit26[index]['pdf_page']}") for index, row in enumerate(merit26_csv))
+        for index, row in enumerate(merit26_csv):
+            source = merit26_all[index]
+            slug = 'round-1' if source['round'] == 'Round 1' else 'round-2'
+            assert row['source_pdf_url'].endswith(f"{slug}.pdf#page={source['pdf_page']}")
+    round2_book = load_workbook(ROOT/'data/Rajasthan-NEET-PG-2026-Round-2-merit.xlsx')
+    assert round2_book['2026 Round 2 Merit'].max_row == 3414
+    comparison = json.loads((ROOT/'data/2026-merit-changes.json').read_text(encoding='utf-8'))
+    assert len(comparison['rows']) == 3413
+    assert (comparison['target_round1']['state_merit_rank'],comparison['target_round2']['state_merit_rank']) == (2091,2193)
+    assert sum(r['membership']=='Added in Round 2' for r in comparison['rows']) == 248
+    assert not any(r['membership']=='Absent from Round 2' for r in comparison['rows'])
+    assert sum(r['state_change']=='Added ahead' for r in comparison['rows']) == 102
+    assert sum(r['air_change']=='Added ahead' for r in comparison['rows']) == 88
+    comparison_book=load_workbook(ROOT/'data/Rajasthan-NEET-PG-2026-Round-1-vs-Round-2.xlsx',read_only=True)
+    assert comparison_book['New ahead - state'].max_row == 103
+    assert comparison_book['All ahead - state'].max_row == 2193
+    assert comparison_book['Round 1 merit'].max_row == 3166
+    assert comparison_book['Round 2 merit'].max_row == 3414
 
     matrix_docs = json.loads((ROOT / "data" / "matrix-documents.json").read_text(encoding="utf-8"))["documents"]
     assert len(matrix_docs) == 14
@@ -279,7 +307,7 @@ def main() -> None:
     assert sheet.max_row == len(growth_rows) + 1
     assert [cell.value for cell in sheet[1]][3:8] == ["2024 seats", "2025 seats", "2026 seats", "2024 to 2025", "2025 to 2026"]
     assert sheet.cell(2, 11).hyperlink.target.startswith("https://pramod-zillella.github.io/")
-    print("Verified 45,155 Rajasthan merit/allotment rows, 3,165 cross-counselling rows, 17,064 matrix cells, 384 growth rows, Excel links, source PDFs and site links.")
+    print(f"Verified {sum(expected.values()):,} Rajasthan merit/allotment rows, 3,165 cross-counselling rows, 17,064 matrix cells, 384 growth rows, Excel links, source PDFs and site links.")
 
 
 if __name__ == "__main__":

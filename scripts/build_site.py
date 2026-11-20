@@ -17,6 +17,7 @@ import json
 import shutil
 from datetime import date
 from pathlib import Path
+from build_2026_merit import ROUND2_SHA256, ROUND2_SOURCE_URL
 
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -192,6 +193,17 @@ def build(source_root: Path) -> list[dict]:
         "note": "Revised provisional Round 1 state merit list; replaces the 27 Oct version of 3,160 entries. Later revisions may follow.",
     })
 
+    merit26_round2 = ROOT / 'documents/2026/merit/round-2.pdf'
+    if digest(merit26_round2) != ROUND2_SHA256:
+        raise ValueError('Round 2 merit PDF differs from the verified source')
+    docs.append({
+        'year': 2026, 'kind': 'merit', 'round': 'Round 2', 'roundKey': 'round-2',
+        'order': 2, 'date': '20 Nov 2026', 'pages': 149, 'entries': 3413,
+        'path': 'documents/2026/merit/round-2.pdf', 'status': 'available',
+        'sha256': ROUND2_SHA256, 'sourceUrl': ROUND2_SOURCE_URL, 'archiveUrl': None,
+        'note': 'Provisional Round 2 state merit list. Supplied PDF matches the official Board URL byte-for-byte. Changes in list membership do not establish withdrawal, eligibility, choice filling or joining.',
+    })
+
     allot26 = ROOT / "documents" / "2026" / "allotment" / "round-1.pdf"
     if digest(allot26) != ALLOTMENT_2026_SHA256:
         raise ValueError(f"2026 allotment PDF differs from Board copy: {allot26}")
@@ -220,7 +232,7 @@ def build(source_root: Path) -> list[dict]:
     (ROOT / "data").mkdir(parents=True, exist_ok=True)
     manifest = {
         "built": date.today().isoformat(),
-        "sourceSnapshot": "24 Oct 2026 (2024 files); 20 Oct 2026 (2025 files); 28 Oct 2026 (revised merit); 31 Oct 2026 (indicative Rajasthan allotment); 24 Oct 2026 (MCC final Round 1)",
+        "sourceSnapshot": "24 Oct 2026 (2024 files); 20 Oct 2026 (2025 files); 28 Oct 2026 (revised Round 1 merit); 20 Nov 2026 (Round 2 merit); 31 Oct 2026 (indicative Rajasthan allotment); 24 Oct 2026 (MCC final Round 1)",
         "documents": docs,
     }
     (ROOT / "data" / "documents.json").write_text(

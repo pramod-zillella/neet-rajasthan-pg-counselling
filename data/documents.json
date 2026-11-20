@@ -1,6 +1,6 @@
 {
-  "built": "2026-11-01",
-  "sourceSnapshot": "24 Oct 2026 (2024 files); 20 Oct 2026 (2025 files); 28 Oct 2026 (revised merit); 31 Oct 2026 (indicative Rajasthan allotment); 24 Oct 2026 (MCC final Round 1)",
+  "built": "2026-11-20",
+  "sourceSnapshot": "24 Oct 2026 (2024 files); 20 Oct 2026 (2025 files); 28 Oct 2026 (revised Round 1 merit); 20 Nov 2026 (Round 2 merit); 31 Oct 2026 (indicative Rajasthan allotment); 24 Oct 2026 (MCC final Round 1)",
   "documents": [
     {
       "year": 2026,
@@ -50,6 +50,22 @@
       "archiveUrl": null,
       "alternatePath": "documents/2026/merit/round-1-27-oct.pdf",
       "note": "Revised provisional Round 1 state merit list; replaces the 27 Oct version of 3,160 entries. Later revisions may follow."
+    },
+    {
+      "year": 2026,
+      "kind": "merit",
+      "round": "Round 2",
+      "roundKey": "round-2",
+      "order": 2,
+      "date": "20 Nov 2026",
+      "pages": 149,
+      "entries": 3413,
+      "path": "documents/2026/merit/round-2.pdf",
+      "status": "available",
+      "sha256": "a7e783432fe707cfd0e7a0bbc72ebdd63b4bd9b5ddcce17712e9e551ed9e490d",
+      "sourceUrl": "https://pg.neetrajasthan.com/notifications/1795180258933.pdf",
+      "archiveUrl": null,
+      "note": "Provisional Round 2 state merit list. Supplied PDF matches the official Board URL byte-for-byte. Changes in list membership do not establish withdrawal, eligibility, choice filling or joining."
     },
     {
       "year": 2025,

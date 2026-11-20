@@ -63,13 +63,14 @@ let browser, ws;
       if (await evaluate(expression)) return;
       await sleep(100);
     }
-    throw new Error(`Timed out: ${expression}`);
+    const context = await evaluate(`({url:location.href,results:document.getElementById('result-count')?.textContent,status:document.getElementById('changes-status')?.textContent,error:document.getElementById('changes-error')?.textContent})`);
+    throw new Error(`Timed out: ${expression}; ${JSON.stringify(context)}; browser errors: ${JSON.stringify(errors)}`);
   };
   await send('Runtime.enable');
   await send('Page.enable');
   await send('Emulation.setDeviceMetricsOverride', {width:1440,height:950,deviceScaleFactor:1,mobile:false});
-  await send('Page.navigate', {url:base + '/merit.html?year=2026'});
-  await waitFor(`document.getElementById('result-count')?.textContent.includes('3,165 of 3,165')`);
+  await send('Page.navigate', {url:base + '/merit.html?year=2026&round=round-1'});
+  await waitFor(`document.getElementById('result-count')?.textContent.includes('3,165 of 6,578')`);
   if (process.env.UI_SNAPSHOT_DIR) {
     fs.mkdirSync(process.env.UI_SNAPSHOT_DIR, {recursive:true});
     const shot = await send('Page.captureScreenshot', {format:'png',captureBeyondViewport:false});
@@ -80,17 +81,17 @@ let browser, ws;
   assert.equal(await evaluate(`document.querySelectorAll('#domicile-filter .picker-options input').length`), 1);
   assert.equal(await evaluate(`document.querySelector('#domicile-filter .picker-options input').value`), 'Telangana');
   await evaluate(`document.querySelector('#domicile-filter .picker-options input').click()`);
-  await waitFor(`document.getElementById('result-count').textContent.includes('3 of 3,165')`);
+  await waitFor(`document.getElementById('result-count').textContent.includes('3 of 6,578')`);
   assert.equal(await evaluate(`document.querySelectorAll('#domicile-filter .picker-chip').length`), 1);
   assert.ok((await evaluate(`location.search`)).includes('domicile=Telangana'));
   await evaluate(`document.querySelector('#domicile-filter .picker-chip button').click()`);
-  await waitFor(`document.getElementById('result-count').textContent.includes('3,165 of 3,165')`);
+  await waitFor(`document.getElementById('result-count').textContent.includes('3,165 of 6,578')`);
   await evaluate(`(()=>{const x=document.getElementById('domicile-filter-search');x.focus();x.value='all except';x.dispatchEvent(new Event('input',{bubbles:true}));})()`);
   await evaluate(`document.querySelector('#domicile-filter .picker-options input').click()`);
-  await waitFor(`document.getElementById('result-count').textContent.includes('257 of 3,165')`);
+  await waitFor(`document.getElementById('result-count').textContent.includes('257 of 6,578')`);
   const shared = await evaluate(`location.href`);
   await send('Page.navigate', {url:shared});
-  await waitFor(`document.getElementById('result-count')?.textContent.includes('257 of 3,165')`);
+  await waitFor(`document.getElementById('result-count')?.textContent.includes('257 of 6,578')`);
 
   await send('Page.navigate', {url:base + '/matrix.html?year=2025&round=round-1'});
   await waitFor(`location.pathname.endsWith('/matrix.html') && document.querySelector('#college-filter .picker-options input') && !document.getElementById('result-count')?.textContent.includes('Loading')`);
@@ -158,7 +159,61 @@ let browser, ws;
   await waitFor(`document.getElementById('position-title')?.textContent.includes('Rank 1')`);
   assert.ok((await evaluate(`document.querySelector('#rank-breakdown .rank-total')?.textContent`)).includes('0'));
 
+  await send('Page.navigate', {url:base + '/merit.html?year=2026&round=round-2'});
+  await waitFor(`document.getElementById('result-count')?.textContent.includes('3,413 of 6,578')`);
+  await evaluate(`(()=>{const x=document.getElementById('search-filter');x.value='PM1596';x.dispatchEvent(new Event('input',{bubbles:true}));})()`);
+  await waitFor(`document.getElementById('result-count').textContent.includes('1 of 6,578')`);
+  assert.ok((await evaluate(`document.getElementById('table-body').textContent`)).includes('2,193'));
+  assert.ok(await evaluate(`!!document.querySelector('#table-body a[href="documents/2026/merit/round-2.pdf#page=96"]')`));
+
+  await send('Page.navigate', {url:base + '/merit-changes.html?air=61347'});
+  await waitFor(`document.getElementById('result-count')?.textContent.includes('102 of 2,192')`);
+  assert.ok((await evaluate(`document.getElementById('target-cards').textContent`)).includes('2,091'));
+  assert.ok((await evaluate(`document.getElementById('target-cards').textContent`)).includes('2,193'));
+  assert.deepEqual(await evaluate(`Array.from(document.querySelectorAll('#change-breakdown tr')).map(row=>Array.from(row.cells).slice(1).map(cell=>cell.textContent.trim()))`), [
+    ['806','827','+21'],['1,225','1,301','+76'],['1','1','0'],['57','62','+5'],['1','1','0'],['2,090','2,192','+102']
+  ]);
+  if (process.env.UI_SNAPSHOT_DIR) {
+    const shot = await send('Page.captureScreenshot', {format:'png',captureBeyondViewport:false});
+    fs.writeFileSync(path.join(process.env.UI_SNAPSHOT_DIR, 'merit-changes-desktop.png'), Buffer.from(shot.data,'base64'));
+  }
+  await evaluate(`(()=>{const x=document.getElementById('basis-input');x.value='air';x.dispatchEvent(new Event('change',{bubbles:true}));})()`);
+  await waitFor(`document.getElementById('result-count').textContent.includes('88 of 1,854')`);
+  await evaluate(`(()=>{const x=document.getElementById('basis-input');x.value='state';x.dispatchEvent(new Event('change',{bubbles:true}));})()`);
+  await waitFor(`document.getElementById('result-count').textContent.includes('102 of 2,192')`);
+  await evaluate(`(()=>{const x=document.getElementById('domicile-filter-search');x.focus();x.value='all except';x.dispatchEvent(new Event('input',{bubbles:true}));document.querySelector('#domicile-filter .picker-options input').click();})()`);
+  await waitFor(`document.getElementById('result-count').textContent.includes('5 of 2,192')`);
+  const changesShared = await evaluate(`location.href`);
+  await send('Page.navigate', {url:changesShared});
+  await waitFor(`document.getElementById('result-count')?.textContent.includes('5 of 2,192')`);
+  await evaluate(`document.querySelector('[data-sort="neet_pg_air"]').click()`);
+  const sortedAir = await evaluate(`Array.from(document.querySelectorAll('#table-body tr')).map(r=>Number(r.cells[1].textContent.replaceAll(',','')))`);
+  assert.deepEqual(sortedAir, [...sortedAir].sort((a,b)=>a-b));
+  await evaluate(`window.__downloadBlob=null;URL.createObjectURL=blob=>{window.__downloadBlob=blob;return 'blob:browser-test';};HTMLAnchorElement.prototype.click=function(){};document.getElementById('download-csv').click();`);
+  const downloaded = await evaluate(`window.__downloadBlob.text()`);
+  assert.equal(downloaded.trim().split(/\r?\n/).length,6);
+  assert.ok(downloaded.includes('round-2.pdf#page='));
+  await evaluate(`document.getElementById('clear-filters').click()`);
+  await waitFor(`document.getElementById('result-count').textContent.includes('2,192 of 2,192')`);
+  await evaluate(`(()=>{const x=document.getElementById('change-filter-search');x.focus();x.value='absent';x.dispatchEvent(new Event('input',{bubbles:true}));document.querySelector('#change-filter .picker-options input').click();})()`);
+  await waitFor(`document.getElementById('result-count').textContent.includes('0 of 2,192')`);
+  assert.equal(await evaluate(`document.getElementById('download-csv').disabled`),true);
+  await evaluate(`document.getElementById('air-input').value='999999';document.getElementById('changes-form').requestSubmit();`);
+  await waitFor(`document.getElementById('changes-error').hidden===false`);
+  assert.equal(await evaluate(`document.getElementById('changes-results').hidden`),true);
+  await evaluate(`(()=>{document.getElementById('clear-filters').click();const x=document.getElementById('basis-input');x.value='air';x.dispatchEvent(new Event('change',{bubbles:true}));})()`);
+  await waitFor(`document.getElementById('result-count').textContent.includes('3,413 of 3,413') && !document.getElementById('changes-results').hidden`);
+
   await send('Emulation.setDeviceMetricsOverride', {width:390,height:844,deviceScaleFactor:1,mobile:true});
+  await send('Page.navigate', {url:base + '/merit-changes.html?air=61347'});
+  await waitFor(`document.getElementById('result-count')?.textContent.includes('102 of 2,192')`);
+  assert.equal(await evaluate(`document.documentElement.scrollWidth <= window.innerWidth`),true);
+  if (process.env.UI_SNAPSHOT_DIR) {
+    const shot = await send('Page.captureScreenshot', {format:'png',captureBeyondViewport:false});
+    fs.writeFileSync(path.join(process.env.UI_SNAPSHOT_DIR, 'merit-changes-mobile.png'), Buffer.from(shot.data,'base64'));
+  }
+  await evaluate(`(()=>{const x=document.getElementById('change-filter-search');x.scrollIntoView({block:'center'});x.focus();x.dispatchEvent(new Event('input',{bubbles:true}));})()`);
+  assert.equal(await evaluate(`(()=>{const r=document.querySelector('#change-filter .picker-popover').getBoundingClientRect();return r.left>=0&&r.right<=window.innerWidth&&document.documentElement.scrollWidth<=window.innerWidth;})()`),true);
   await send('Page.navigate', {url:base + '/rank-comparison.html'});
   await waitFor(`document.getElementById('rank-results')?.hidden === false`);
   assert.equal(await evaluate(`document.documentElement.scrollWidth <= window.innerWidth`), true);
@@ -166,8 +221,8 @@ let browser, ws;
     const shot = await send('Page.captureScreenshot', {format:'png',captureBeyondViewport:false});
     fs.writeFileSync(path.join(process.env.UI_SNAPSHOT_DIR, 'rank-comparison-mobile.png'), Buffer.from(shot.data,'base64'));
   }
-  await send('Page.navigate', {url:base + '/merit.html?year=2026'});
-  await waitFor(`document.getElementById('result-count')?.textContent.includes('3,165 of 3,165')`);
+  await send('Page.navigate', {url:base + '/merit.html?year=2026&round=round-1'});
+  await waitFor(`document.getElementById('result-count')?.textContent.includes('3,165 of 6,578')`);
   await evaluate(`(()=>{const x=document.getElementById('domicile-filter-search');x.scrollIntoView({block:'center'});x.focus();x.value='tel';x.dispatchEvent(new Event('input',{bubbles:true}));})()`);
   assert.equal(await evaluate(`document.querySelector('#domicile-filter .picker-popover').hidden`), false);
   assert.equal(await evaluate(`(()=>{const r=document.querySelector('#domicile-filter .picker-popover').getBoundingClientRect();return r.left>=0&&r.right<=window.innerWidth&&document.documentElement.scrollWidth<=window.innerWidth;})()`), true);

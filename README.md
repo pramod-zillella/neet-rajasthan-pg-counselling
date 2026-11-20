@@ -1,6 +1,6 @@
 # Rajasthan NEET-PG merit lists and allotments
 
-A standalone, static GitHub Pages archive for Rajasthan NEET-PG 2024, 2025 and 2026 Round 1. The [seat-matrix](matrix.html), [merit-list](merit.html), [allotment](allotments.html), [rank-comparison](rank-comparison.html) and [Rajasthan-MCC cross-counselling](cross-counselling.html) pages have filterable tables, continuous scrolling and filtered-CSV export. Categorical filters support multiple selections, including **All Except Rajasthan** for domicile. Download the [2026 revised merit workbook](data/Rajasthan-NEET-PG-2026-Round-1-merit.xlsx), [2026 allotment and MCC workbook](data/Rajasthan-NEET-PG-2026-Round-1-allotments-and-MCC.xlsx), [2024-2025 merit/allotment workbook](data/Rajasthan-NEET-PG-2024-2025-filterable.xlsx), or [2024-2025 matrix workbook](data/Rajasthan-NEET-PG-2024-2025-seat-matrices.xlsx). Each row links to a PDF page.
+A standalone, static GitHub Pages archive for Rajasthan NEET-PG 2024, 2025 and 2026 (Round 1 and Round 2 merit). The [seat-matrix](matrix.html), [merit-list](merit.html), [allotment](allotments.html), [rank-comparison](rank-comparison.html) and [Rajasthan-MCC cross-counselling](cross-counselling.html) pages have filterable tables, continuous scrolling and filtered-CSV export. Categorical filters support multiple selections, including **All Except Rajasthan** for domicile. Download the [2026 revised merit workbook](data/Rajasthan-NEET-PG-2026-Round-1-merit.xlsx), [2026 allotment and MCC workbook](data/Rajasthan-NEET-PG-2026-Round-1-allotments-and-MCC.xlsx), [2024-2025 merit/allotment workbook](data/Rajasthan-NEET-PG-2024-2025-filterable.xlsx), or [2024-2025 matrix workbook](data/Rajasthan-NEET-PG-2024-2025-seat-matrices.xlsx). Each row links to a PDF page.
 
 The site needs no account, API key or server-side database. Open the [home page](index.html) on GitHub Pages. For local preview, run `python -m http.server 8000` in this directory and visit `http://localhost:8000/`. Browsers generally block `fetch()` from `file://`, so double-clicking an HTML file will not load the document register.
 
@@ -12,9 +12,32 @@ Selecting categorical options updates the page URL, so you can copy a link to th
 | --- | --- | --- |
 | 2024 | 16,914 rows: Rounds 1–3, revised Stray, Special Stray; earlier provisional Stray version linked | 4,969 rows: Rounds 1–3; Stray and Special Stray archive links only |
 | 2025 | 13,221 rows: Rounds 1–3 and Stray | 5,520 rows: Rounds 1–3 and Stray, including an incomplete/unverified Round 3 recovered copy |
-| 2026 | 3,165 rows: revised provisional Round 1, 28 October 2026 | 1,366 indicative Round 1 rows, 31 October 2026; 406 also have an MCC Round 1 allotment |
+| 2026 | 6,578 round records: 3,165 revised Round 1 (28 October) + 3,413 provisional Round 2 (20 November) | 1,366 indicative Round 1 rows, 31 October 2026; 406 also have an MCC Round 1 allotment |
 
-The 2024 merit lists do **not** explicitly contain NEET-PG All India Rank. The 2025 merit lists and 2026 Round 1 list contain both state merit rank and AIR. The 2026 list is provisional and does not establish final eligibility or admission. An allotment is not a final joining record; candidates can recur across rounds, and an allotment-row count is not a count of distinct candidates. The recovered 2025 Round 3 allotment PDF has 74 physical pages although its page footers say “of 125”; its completeness is not certified. Do not infer a final closing cutoff from it. The older Board portals were unavailable during research, and later corrigenda have not been ruled out.
+The 2024 merit lists do **not** explicitly contain NEET-PG All India Rank. The 2025 merit lists and 2026 Round 1 and Round 2 lists contain both state merit rank and AIR. The 2026 list is provisional and does not establish final eligibility or admission. An allotment is not a final joining record; candidates can recur across rounds, and an allotment-row count is not a count of distinct candidates. The recovered 2025 Round 3 allotment PDF has 74 physical pages although its page footers say “of 125”; its completeness is not certified. Do not infer a final closing cutoff from it. The older Board portals were unavailable during research, and later corrigenda have not been ruled out.
+
+## 2026 Round 1 to Round 2 changes
+
+The [round-change page](merit-changes.html?air=61347) follows AIR **61,347** from state rank **2,091** in revised Round 1 to **2,193** in provisional Round 2. Its reference AIR is editable. Switch between **earlier state merit position** (includes in-service bonus effects) and **better AIR** (strictly smaller AIR, regardless of bonus). Searchable multi-select filters support change type, domicile including All Except Rajasthan, service and considered category. Sort columns or export every filtered row to CSV.
+
+All **3,165** Round 1 candidates remain in Round 2. There are **248 newly listed candidates**, for **3,413** total; no removals. These are changes in published list membership, not proof of withdrawal, joining elsewhere or active choice filling.
+
+| Ahead of AIR 61,347 in state merit order | Round 1 | Round 2 | Net additions |
+| --- | ---: | ---: | ---: |
+| Rajasthan, In-Service | 806 | 827 | 21 |
+| Rajasthan, Non-Service | 1,225 | 1,301 | 76 |
+| Other domicile, In-Service | 1 | 1 | 0 |
+| Other domicile, Non-Service | 57 | 62 | 5 |
+| Domicile Not Applicable | 1 | 1 | 0 |
+| Total | 2,090 | 2,192 | 102 |
+
+Using strictly better AIR instead gives **1,766 → 1,854**, or **88 additions**. The other **14 new candidates ahead in state merit** have worse AIRs but in-service bonus marks. The target candidate is excluded. All 102 entering the state-ahead set are newly listed; no retained candidates cross this target threshold.
+
+Candidates are matched by unique AIR within the same exam year, cross-checked with registration ID. All shared identifiers agree. Current source attributes are shown alongside old values when they change; rank movement of an existing candidate is not counted as a newly listed candidate. Domicile Not Applicable is never classified as out-of-state. Rajasthan candidates can also compete for private-college AI seats; none of these counts establishes eligibility or a college-specific competition pool.
+
+The supplied [149-page Round 2 PDF](documents/2026/merit/round-2.pdf), dated **20 November 2026**, matches the [official Board PDF](https://pg.neetrajasthan.com/notifications/1795180258933.pdf) byte-for-byte: SHA-256 `a7e783432fe707cfd0e7a0bbc72ebdd63b4bd9b5ddcce17712e9e551ed9e490d`. Every page header/footer, all 3,413 sequential ranks, unique AIR/registration IDs and marks arithmetic were checked. No candidate names, gender or NEET roll numbers are added to derived tables.
+
+Downloads: [Round 2 merit Excel](data/Rajasthan-NEET-PG-2026-Round-2-merit.xlsx), [comparison Excel](data/Rajasthan-NEET-PG-2026-Round-1-vs-Round-2.xlsx), [comparison summary CSV](data/2026-merit-changes-summary.csv), [all paired records](data/2026-merit-changes.csv). Excel includes both full merit lists, the state-order and AIR views, source-page links and newly listed candidates ahead of AIR 61,347. The existing cross-counselling and 2025-vs-2026 pages explicitly retain Round 1 as their baseline.
 
 ## Round 1 rank comparison
 
@@ -32,7 +55,7 @@ The 2024 government medical matrices print the first seat column as “Govt.” 
 
 The tables retain registration IDs for cross-reference but omit candidate names, relatives, gender and NEET roll numbers. For 2024, each recovered allotment was joined to the same-round merit PDF; all 4,969 matches agreed on merit number. For 2025, all 5,520 recovered allotments were matched to their round-specific merit records; this build rechecked both state merit number and AIR. Domicile and provisional considered category were read from the corresponding merit PDFs and added to allotments. PDF source URLs and checksums are in [`data/documents.json`](data/documents.json). The 2024 copies were validated against the Internet Archive's recorded digests and printed page sequences; the 2025 copies against the research pack's SHA-256 source register.
 
-The 2026 merit list was extracted from the Board's [138-page revised provisional PDF](documents/2026/merit/round-1.pdf) dated 28 October 2026. Its 3,165 sequential state ranks, unique registration IDs, AIRs, marks arithmetic, page footers and headers are checked by [`scripts/build_2026_merit.py`](scripts/build_2026_merit.py). The [27 October version](documents/2026/merit/round-1-27-oct.pdf) with 3,160 entries is retained. The revised PDF has SHA-256 `9330f157a453cb7ddbed7c178d55adb8e15e8aee54452ee55905eee4cf336a1f`. The Board does not print primary filled reservation category in this merit list, so that field remains blank. Candidate names, gender and NEET roll numbers are omitted from derived tables.
+The 2026 Round 1 merit list was extracted from the Board's [138-page revised provisional PDF](documents/2026/merit/round-1.pdf) dated 28 October 2026. Its 3,165 sequential state ranks, unique registration IDs, AIRs, marks arithmetic, page footers and headers are checked by [`scripts/build_2026_merit.py`](scripts/build_2026_merit.py). The [27 October version](documents/2026/merit/round-1-27-oct.pdf) with 3,160 entries is retained. The revised PDF has SHA-256 `9330f157a453cb7ddbed7c178d55adb8e15e8aee54452ee55905eee4cf336a1f`. The Board does not print primary filled reservation category in this merit list, so that field remains blank. Candidate names, gender and NEET roll numbers are omitted from derived tables.
 
 The [2026 Rajasthan indicative allotment](documents/2026/allotment/round-1.pdf) has 1,366 rows. Every registration ID, state rank and AIR matches revised merit. The [MCC final Round 1 result](documents/2026/mcc/round-1.pdf) has 28,723 unique AIRs. Exact AIR matching finds 1,070 MCC allotments among Rajasthan merit-list candidates, including 949 Rajasthan-domicile candidates; 406 candidates occur in both allotment lists. This does not establish joining. The supplied MCC CSV omitted 1,733 rows, so [`scripts/mcc_2026_source.py`](scripts/mcc_2026_source.py) extracts the official PDF. [`scripts/build_2026_allotment.py`](scripts/build_2026_allotment.py) generates the [cross-counselling table](cross-counselling.html), CSVs and Excel. MCC All India and Rajasthan Board AI seat types belong to different counselling processes.
 
@@ -63,14 +86,17 @@ The source research packs live in a sibling `neet-specialty-knowledge-base/expor
 python -m pip install -r requirements.txt
 python scripts/build_site.py
 python scripts/build_2026_merit.py
+python scripts/build_merit_changes.py
 python scripts/build_2026_allotment.py
 python scripts/build_tables.py
 python scripts/build_matrix.py
 python scripts/build_growth.py
 python scripts/verify_site.py
+node scripts/check_merit_changes.cjs
+node scripts/check_browser.cjs
 ```
 
-The 2024 matrix PDFs are already in `documents/2024/matrix/`; `scripts/fetch_2024_matrix_pdfs.py` retrieves the selected archive captures and checks their recorded SHA-1 digests if they need to be restored. `build_site.py` and `build_tables.py` accept `--source` for a different exports directory. `build_site.py` checks each copied merit/allotment PDF against its manifest SHA-256. `build_2026_merit.py` validates and extracts the retained 2026 Round 1 PDF. `build_tables.py` asserts source row counts, sequential 2024 list numbers, same-round registration matches, and 2025 rank/AIR agreement. `build_matrix.py` reconciles 2024 printed row/column totals, 2025 source hashes and round totals. Review the site text if source status, dates or rounds change. Commit and push to `main` to publish an update.
+The 2024 matrix PDFs are already in `documents/2024/matrix/`; `scripts/fetch_2024_matrix_pdfs.py` retrieves the selected archive captures and checks their recorded SHA-1 digests if they need to be restored. `build_site.py` and `build_tables.py` accept `--source` for a different exports directory. `build_site.py` checks each copied merit/allotment PDF against its manifest SHA-256. `build_2026_merit.py` validates and extracts both retained 2026 merit PDFs. `build_merit_changes.py` exports the independently checked candidate comparison. `check_merit_changes.cjs` checks the browser calculation against every paired record and exercises removals and rank crossings. `build_tables.py` asserts source row counts, sequential 2024 list numbers, same-round registration matches, and 2025 rank/AIR agreement. `build_matrix.py` reconciles 2024 printed row/column totals, 2025 source hashes and round totals. Review the site text if source status, dates or rounds change. Commit and push to `main` to publish an update.
 
 ## GitHub Pages setup
 

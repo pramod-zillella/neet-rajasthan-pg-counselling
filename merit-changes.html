@@ -1,0 +1,47 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#102c3a">
+  <meta name="description" content="Compare Rajasthan NEET-PG 2026 Round 1 and Round 2 merit lists: additions, removals and candidates ahead of a chosen AIR, including in-service bonus effects.">
+  <title>Round 1 to Round 2 changes · Rajasthan NEET-PG</title>
+  <link rel="stylesheet" href="styles.css?v=20261120-round2"><link rel="stylesheet" href="merit-changes.css?v=20261120-round2">
+  <script defer src="filter-controls.js?v=20261027-typeahead"></script>
+  <script defer src="merit-changes-core.js?v=20261120-round2"></script><script defer src="merit-changes.js?v=20261120-round2"></script>
+</head>
+<body>
+  <a class="skip" href="#main">Skip to content</a>
+  <header class="site-header"><div class="wrap header-inner"><a class="brand" href="index.html" aria-label="Rajasthan NEET-PG archive home"><span class="brand-mark">RJ</span><span>Rajasthan <small>NEET-PG archive</small></span></a><nav aria-label="Main navigation"><a href="index.html">Overview</a><a href="merit.html">Merit lists</a><a class="active" aria-current="page" href="merit-changes.html">Round changes</a><a href="rank-comparison.html">Rank comparison</a><a href="allotments.html">Allotments</a><a href="cross-counselling.html">Rajasthan &times; MCC</a><a href="matrix.html">Seat matrices</a><a href="growth.html">Seat growth</a></nav></div></header>
+  <main id="main" class="wrap collection">
+    <div class="breadcrumb"><a href="merit.html">Merit lists</a><span aria-hidden="true">/</span><span>2026 round changes</span></div>
+    <div class="collection-heading"><div><p class="eyebrow dark">Same exam / Round 1 → Round 2</p><h1>Who has been added ahead?</h1><p>Compare revised Round 1 (28 October) with provisional Round 2 (20 November). Follow the same candidate by AIR as their state rank changes.</p></div></div>
+    <div class="insight"><span class="insight-icon" aria-hidden="true">i</span><p><strong>A list change is not a joining or withdrawal record.</strong> In-service bonus marks can place a candidate with a worse AIR ahead in state merit. Both views below exclude the target candidate.</p></div>
+    <section class="rank-control changes-control" aria-labelledby="compare-title">
+      <div><p class="eyebrow dark">Your reference</p><h2 id="compare-title">Compare around an AIR</h2><p>Default: 61,347. State order follows that candidate’s actual position in each list.</p></div>
+      <form id="changes-form" class="rank-form"><label for="air-input">NEET-PG 2026 AIR</label><div><input id="air-input" type="number" min="1" step="1" value="61347" inputmode="numeric" required><button class="button primary" type="submit">Compare</button></div></form>
+      <label class="basis-control" for="basis-input">Count candidates with<select id="basis-input"><option value="state">Earlier state merit position</option><option value="air">Better AIR (lower number)</option></select></label>
+    </section>
+    <p id="changes-status" role="status" aria-live="polite">Loading both merit lists…</p>
+    <p id="changes-error" class="rank-error" role="alert" hidden></p>
+    <div id="changes-results" hidden>
+      <div id="target-cards" class="position-cards"></div>
+      <p id="whole-list-reading" class="changes-note"></p>
+      <div id="change-stats" class="change-stats" aria-label="Change in candidates ahead"></div>
+      <p id="change-reading" class="rank-reading"></p>
+      <div class="table-scroll rank-table changes-breakdown"><table><caption id="breakdown-caption">Domicile and service composition ahead</caption><thead><tr><th scope="col">Group</th><th scope="col">Round 1</th><th scope="col">Round 2</th><th scope="col">Net change</th></tr></thead><tbody id="change-breakdown"></tbody></table></div>
+      <p class="caption">“Other domicile” excludes Not Applicable. Rajasthan-domicile candidates can also compete for private-college AI seats. These counts do not establish eligibility or choices.</p>
+      <section class="browser" aria-labelledby="records-title">
+        <div class="browser-head"><div><p class="eyebrow dark">Inspect the changes</p><h2 id="records-title">Candidate comparison</h2></div><p id="result-count" role="status" aria-live="polite"></p></div>
+        <div class="filters primary-filters"><div id="change-filter"></div><div id="domicile-filter"></div><label>Search AIR / registration ID<input id="search-filter" type="search" placeholder="AIR or PM registration ID" autocomplete="off"></label></div>
+        <div class="filters changes-extra"><div id="service-filter"></div><div id="category-filter"></div></div>
+        <p class="filter-help">The initial view shows additions, absences and candidates crossing the threshold. Clear filters to include everyone ahead in either round, including retained candidates with corrected details. The summary above always uses the complete lists.</p>
+        <div class="table-toolbar"><p>Click a column to sort. Where domicile, service or category changed, both values are shown. Sources open the correct round and page.</p><div><button type="button" id="clear-filters" class="button outline">Clear filters</button><button type="button" id="download-csv" class="button primary">Export filtered CSV</button><a class="button outline" href="data/Rajasthan-NEET-PG-2026-Round-1-vs-Round-2.xlsx" download>Excel · AIR 61,347</a></div></div>
+        <div class="data-scroll" role="region" aria-label="Round changes table" tabindex="0"><table id="results-table"><thead id="table-head"></thead><tbody id="table-body"></tbody></table></div>
+        <div id="scroll-sentinel" class="scroll-sentinel" aria-hidden="true"></div><p class="table-foot">Rows load as you scroll. Sorting and export cover every filtered row. Excel contains the fixed AIR 61,347 analysis and both full merit lists.</p>
+      </section>
+    </div>
+    <section class="footnote-panel"><h2>Sources and method</h2><p><a href="documents/2026/merit/round-1.pdf" target="_blank" rel="noopener">Revised Round 1: 28 October 2026</a> contains 3,165 records. <a href="documents/2026/merit/round-2.pdf" target="_blank" rel="noopener">Provisional Round 2: 20 November 2026</a> contains 3,413. The supplied Round 2 PDF matches the <a href="https://pg.neetrajasthan.com/notifications/1795180258933.pdf" target="_blank" rel="noopener">official Board copy</a> byte-for-byte.</p><p>Candidates are matched by unique AIR within the same exam year and cross-checked against registration ID. All shared records retain their registration IDs. “Added” means newly present in the compared list; “absent” would mean no matching record in the other list. Neither establishes the reason or admission status. Candidates remaining on both lists can have corrected attributes or bonus marks; threshold crossings are separated from additions/removals.</p><p>State-order counts use the target’s <em>different</em> state rank in each round. Better-AIR counts use AIR strictly below the entered number, irrespective of bonus marks. If the target is absent from a list, its state position is not inferred; the AIR-threshold view remains available. Names, gender and NEET roll numbers are omitted from derived data. Later revisions may change these results.</p></section>
+  </main>
+  <footer class="site-footer"><div class="wrap"><p>Independent research archive · Round 2 source dated 20 November 2026</p><p><a href="merit.html?year=2026&amp;round=round-2">Round 2 merit</a><a href="data/2026-merit-changes-summary.csv">Summary CSV</a><a href="data/documents.json">Source register</a></p></div></footer>
+</body>
+</html>

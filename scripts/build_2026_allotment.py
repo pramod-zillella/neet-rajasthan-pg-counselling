@@ -70,6 +70,7 @@ def source_rows() -> list[dict]:
 
 def build() -> None:
     merit = json.loads((ROOT / "data/2026-merit.json").read_text(encoding="utf-8"))
+    merit = [row for row in merit if row['round'] == 'Round 1']
     assert len(merit) == 3165, "Rebuild revised 2026 merit first"
     by_registration = {row["registration_id"]: row for row in merit}
     mcc_rows = extract_mcc(MCC_PDF)

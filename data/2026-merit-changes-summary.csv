@@ -1,0 +1,13 @@
+﻿basis,group,round1,round2,net_change
+state,Rajasthan · In-Service,806,827,21
+state,Rajasthan · Non-Service,1225,1301,76
+state,Other domicile · In-Service,1,1,0
+state,Other domicile · Non-Service,57,62,5
+state,Domicile not applicable,1,1,0
+state,All candidates,2090,2192,102
+air,Rajasthan · In-Service,483,490,7
+air,Rajasthan · Non-Service,1225,1301,76
+air,Other domicile · In-Service,0,0,0
+air,Other domicile · Non-Service,57,62,5
+air,Domicile not applicable,1,1,0
+air,All candidates,1766,1854,88

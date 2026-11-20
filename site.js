@@ -123,11 +123,11 @@
       if (control.disabled) control.value = '';
     }
     hintEl.textContent = years.length > 1
-      ? (kind === 'merit' ? 'Showing multiple exam years. Compare ranks within the same year and round; 2024 has no published AIR and 2026 Round 1 is revised provisional.' : 'Showing multiple exam years. The 2024 allotments have no published AIR; 2026 Round 1 is indicative. Compare ranks within each year and round.')
+      ? (kind === 'merit' ? 'Showing multiple exam years. Compare ranks within the same year and round; 2024 has no published AIR and 2026 Round 1 is revised provisional and Round 2 is provisional.' : 'Showing multiple exam years. The 2024 allotments have no published AIR; 2026 Round 1 is indicative. Compare ranks within each year and round.')
       : years[0] === 2024
       ? (kind === 'merit' ? '2024 has state merit only; AIR is not in these PDFs.' : '2024 Round 1 uses combined merit; later rounds use state merit after weightage. AIR is not shown.')
       : years[0] === 2026
-      ? (kind === 'merit' ? '2026 Round 1 merit is the revised provisional list of 28 October. The Board prints AIR and state merit separately.' : '2026 Round 1 Rajasthan allotment is indicative, dated 31 October. MCC matches come from MCC’s final Round 1 result of 24 October; two allotments do not prove two joins.')
+      ? (kind === 'merit' ? '2026 merit: revised Round 1 (28 October, 3,165 rows) and provisional Round 2 (20 November, 3,413 rows). Select a round; a candidate can appear in both. AIR and state merit are separate.' : '2026 Round 1 Rajasthan allotment is indicative, dated 31 October. MCC matches come from MCC’s final Round 1 result of 24 October; two allotments do not prove two joins.')
       : (kind === 'merit' ? '2025 shows both state merit and NEET-PG AIR.' : '2025 AIR comes from the matching round-specific merit list; Round 3 allotment coverage is incomplete.');
     updateUrl();
   }
@@ -238,7 +238,7 @@
       await Promise.all(years.map(async year => {
         const key = `${year}-${kind}`;
         if (!cache.has(key)) {
-          const response = await fetch(`data/${key}.json`);
+          const response = await fetch(`data/${key}.json?v=20261120-round2`);
           if (!response.ok) throw new Error(`HTTP ${response.status} for ${key}`);
           cache.set(key, await response.json());
         }
@@ -290,7 +290,7 @@
   dialog.addEventListener('close', () => frame.removeAttribute('src'));
 
   try {
-    const response = await fetch('data/documents.json');
+    const response = await fetch('data/documents.json?v=20261120-round2');
     if (!response.ok) throw new Error(`HTTP ${response.status}`);
     state.documents = (await response.json()).documents;
     const savedSelections = Object.fromEntries(Object.keys(filters).map(key => [key,pageParams.getAll(key)]));
